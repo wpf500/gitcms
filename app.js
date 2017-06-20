@@ -6,6 +6,7 @@ import expressNunjucks from 'express-nunjucks';
 import sassMiddleware from 'node-sass-middleware';
 
 import addRoutes from './routes/add';
+import { openDb } from './services/db';
 
 const app = express();
 const isDev = app.get('env') === 'development';
@@ -29,6 +30,6 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-app.listen(3000, () => {
+openDb().then(app.listen(3000, () => {
     console.log('Listening on 3000');
-});
+}));

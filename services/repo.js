@@ -3,6 +3,8 @@ import fs from 'mz/fs';
 import crypto from 'crypto';
 import Git from 'nodegit';
 
+import db from './db';
+
 function getRepoDir(repoUrl) {
     const hash = crypto.createHash('sha1').update(repoUrl).digest('hex');
     return path.join(__dirname, '../repos', hash);
@@ -19,7 +21,7 @@ async function getFetchOpts(publicKey, privateKey) {
     };
 }
 
-export async function loadRepo(repoUrl, publicKey, privateKey) {
+export async function openRepo(repoUrl, publicKey, privateKey) {
     // TODO: get keys from sqlite
     const repo = await Git.Repository.open(repoDir);
 
@@ -35,7 +37,7 @@ export async function cloneRepo(repoUrl, publicKey, privateKey) {
     const exists = await fs.exists(repoDir);
 
     if (exists) {
-        return await loadRepo(repoUrl, publicKey, privateKey);
+        return await openRepo(repoUrl, publicKey, privateKey);
     } else {
         const fetchOpts = await getFetchOpts(publicKey, privateKey);
         // TODO: save keys
