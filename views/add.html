@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add project</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="repoUrl">Repository</label>
+        <input type="text" class="form-control" id="repoUrl" name="repoUrl"
+               placeholder="git@github.com:project" required pattern="[^@]+@[^:]+:.+" />
+    </div>
+    <div class="form-group">
+        <label for="publicKey">Public key</label>
+        <textarea class="form-control" id="publicKey" name="publicKey"
+                  rows="8" readonly>{{ public }}</textarea>
+        <p class="help-block">
+            Add this key to your repository (e.g. as a GitHub deploy key)
+        </p>
+    </div>
+    <input type="hidden" name="privateKey" value="{{private}}" />
+
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

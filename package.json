@@ -23,13 +23,15 @@
     "babel-preset-env": "^1.5.2"
   },
   "dependencies": {
+    "body-parser": "^1.17.2",
     "bootstrap": "^3.3.7",
     "express": "^4.15.3",
     "express-nunjucks": "^2.2.3",
-    "keypair": "^1.0.1",
     "mz": "^2.6.0",
     "node-sass-middleware": "^0.11.0",
     "nodegit": "^0.18.3",
-    "nunjucks": "^3.0.1"
+    "nunjucks": "^3.0.1",
+    "sqlite": "^2.8.0",
+    "ssh-keygen2": "^0.1.0"
   }
 }
