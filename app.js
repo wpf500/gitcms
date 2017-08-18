@@ -11,6 +11,8 @@ import editRoutes from './routes/edit';
 
 import * as db from './services/db';
 
+import auth from './auth.json';
+
 const app = express();
 const isDev = app.get('env') === 'development';
 
@@ -19,10 +21,7 @@ expressNunjucks(app, {
     'watch': isDev, 'noCache': isDev
 });
 
-app.use(basicAuth({
-    'users': {'admin': 'secret'},
-    'challenge': true
-}));
+app.use(basicAuth({'users': auth, 'challenge': true}));
 
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
