@@ -49,7 +49,7 @@ export async function openRepo(repoId) {
     const uiSchema = def.uiSchema;
     const pages = await Promise.all(def.pages.map(loadPage.bind(null, repoDir)));
 
-    return {repo, repoId, repoDir, dbRepo, pages, schema, uiSchema};
+    return {repo, repoDir, dbRepo, pages, schema, uiSchema};
 }
 
 export async function writeRepo(repoId, pageId, data) {
