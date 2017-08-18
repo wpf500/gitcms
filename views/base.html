@@ -4,14 +4,13 @@
     <meta charset="utf8" />
     <title>GitCMS</title>
     <link rel="stylesheet" href="/public/stylesheets/style.css" />
+    {% block stylesheets %}{% endblock %}
 </head>
 <body>
     <div class="container">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </div>
 
-    {% block javascripts %}
-    {% endblock %}
+    {% block javascripts %}{% endblock %}
 </body>
 </html>

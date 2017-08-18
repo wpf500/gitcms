@@ -1,12 +1,26 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Edit page</h1>
-{% for page in pages %}
-    <h2>{{ page.name }}</h2>
-    <div id="edit_{{ page.id }}"></div>
+{% block stylesheets %}
+<style>
+    textarea {
+        min-height: 200px;
+    }
+</style>
+{% endblock %}
 
+{% block content %}
+<h4>
+    Jump to&nbsp;&nbsp;
+{% for page in pages %}
+    <a class="btn btn-primary btn-lg" href="#edit_{{ page.id }}">{{ page.name }}</a>
+{% endfor %}
+</h4>
+
+{% for page in pages %}
     <hr />
+
+    <h1 id="edit_{{ page.id}}">{{ page.name }}</h1>
+    <div id="edit_{{ page.id }}_form"></div>
 {% endfor %}
 {% endblock %}
 
@@ -38,7 +52,7 @@
                 });
             }
         }),
-        document.getElementById('edit_{{ page.id }}')
+        document.getElementById('edit_{{ page.id }}_form')
     );
 {% endfor %}
 </script>

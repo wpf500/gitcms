@@ -3,7 +3,6 @@
 {% block content %}
 <h1>Select a repository</h1>
 {% for repo in repos %}
-    <h2><a href="/edit/{{ repo.id }}">{{ repo.url }}</a></h2>
-    <hr />
+    <h3><a href="/edit/{{ repo.id }}">{{ repo.url }}</a></h3>
 {% endfor %}
 {% endblock %}

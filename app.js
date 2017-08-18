@@ -1,5 +1,6 @@
 import path from 'path';
 
+import basicAuth from 'express-basic-auth';
 import bodyParser from 'body-parser';
 import express from 'express';
 import expressNunjucks from 'express-nunjucks';
@@ -17,6 +18,11 @@ app.set('views', path.join(__dirname, 'views'));
 expressNunjucks(app, {
     'watch': isDev, 'noCache': isDev
 });
+
+app.use(basicAuth({
+    'users': {'admin': 'secret'},
+    'challenge': true
+}));
 
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
