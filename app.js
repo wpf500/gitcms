@@ -37,7 +37,7 @@ addRoutes(app);
 editRoutes(app);
 
 app.get('/', (req, res) => {
-    res.render('index');
+    res.redirect('/edit');
 });
 
 db.open().then(() => app.listen(3000, () => {
