@@ -9,8 +9,8 @@ export default function (app) {
             });
         })
         .post((req, res) => {
-            const {repoUrl, privateKey, publicKey} = req.body;
-            cloneRepo(repoUrl, publicKey, privateKey).then(repo => {
+            const {repoUrl, repoName, privateKey, publicKey} = req.body;
+            cloneRepo(repoUrl, repoName, publicKey, privateKey).then(repo => {
                 res.send('success!');
             }).catch(err => {
                 console.log(err);

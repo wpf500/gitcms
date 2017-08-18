@@ -12,9 +12,9 @@ export async function open() {
     }
 }
 
-export async function addRepo(id, url, publicKey, privateKey) {
-    await db.run(`INSERT INTO repositories (id, url, publicKey, privateKey)
-                    VALUES (?, ?, ?, ?)`, id, url, publicKey, privateKey);
+export async function addRepo(id, name, url, publicKey, privateKey) {
+    await db.run(`INSERT INTO repositories (id, name, url, publicKey, privateKey)
+                    VALUES (?, ?, ?, ?, ?)`, id, name, url, publicKey, privateKey);
 }
 
 export async function fetchRepo(id) {

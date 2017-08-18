@@ -4,9 +4,14 @@
 <h1>Add project</h1>
 <form method="POST">
     <div class="form-group">
-        <label for="repoUrl">Repository</label>
+        <label for="repoUrl">URL</label>
         <input type="text" class="form-control" id="repoUrl" name="repoUrl"
                placeholder="git@github.com:project" required pattern="[^@]+@[^:]+:.+" />
+    </div>
+    <div class="form-group">
+        <label for="repoName">Name</label>
+        <input type="text" class="form-control" id="repoName" name="repoName"
+               placeholder="Project name" required />
     </div>
     <div class="form-group">
         <label for="publicKey">Public key</label>
@@ -16,6 +21,13 @@
             Add this key to your repository (e.g. as a GitHub deploy key)
         </p>
     </div>
+    <div class="form-group">
+        <label>
+            <input type="checkbox" required />
+            I have copied the public key
+        </label>
+    </div>
+
     <input type="hidden" name="privateKey" value="{{private}}" />
 
     <button type="submit" class="btn btn-primary">Add</button>

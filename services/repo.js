@@ -69,7 +69,7 @@ export async function writeRepo(repoId, pageId, data) {
     return oid;
 }
 
-export async function cloneRepo(repoUrl, publicKey, privateKey) {
+export async function cloneRepo(repoUrl, repoName, publicKey, privateKey) {
     const repoId = getRepoId(repoUrl);
     const repoDir = getRepoDir(repoUrl);
 
@@ -79,7 +79,7 @@ export async function cloneRepo(repoUrl, publicKey, privateKey) {
     } else {
         const fetchOpts = await getFetchOpts(publicKey, privateKey);
         const repo = await Git.Clone(repoUrl, repoDir, {fetchOpts});
-        db.addRepo(repoId, repoUrl, publicKey, privateKey);
+        db.addRepo(repoId, repoName, repoUrl, publicKey, privateKey);
 
         return repo;
     }

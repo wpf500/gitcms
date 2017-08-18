@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Select a repository</h1>
+<h1>Select a project</h1>
 {% for repo in repos %}
-    <h3><a href="/edit/{{ repo.id }}">{{ repo.url }}</a></h3>
+    <h3><a href="/edit/{{ repo.id }}">{{ repo.name }}</a></h3>
 {% endfor %}
 {% endblock %}
