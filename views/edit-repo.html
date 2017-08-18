@@ -5,6 +5,12 @@
     textarea {
         min-height: 200px;
     }
+
+    .page {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 3px solid #333;
+    }
 </style>
 {% endblock %}
 
@@ -17,9 +23,7 @@
 </h4>
 
 {% for page in pages %}
-    <hr />
-
-    <h1 id="edit_{{ page.id}}">{{ page.name }}</h1>
+    <h1 class="page" id="edit_{{ page.id}}">{{ page.name }}</h1>
     <div id="edit_{{ page.id }}_form"></div>
 {% endfor %}
 {% endblock %}
