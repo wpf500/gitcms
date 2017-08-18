@@ -20,6 +20,9 @@
     ReactDOM.render(
         React.createElement(JSONSchemaForm.default, {
             'schema': {{ schema|dump|safe }},
+            {% if uiSchema %}
+                'uiSchema': {{ uiSchema|dump|safe }},
+            {% endif %}
             {% if page.data %}
                 'formData': {{ page.data|dump|safe }},
             {% endif %}
