@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit page</h1>
+{% for page in pages %}
+    <h2>{{ page.name }}</h2>
+    <div id="edit_{{ page.id }}"></div>
+
+    <hr />
+{% endfor %}
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js"></script>
+<script src="https://unpkg.com/react-jsonschema-form/dist/react-jsonschema-form.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reqwest/2.0.5/reqwest.min.js"></script>
+<script>
+{% for page in pages %}
+    ReactDOM.render(
+        React.createElement(JSONSchemaForm.default, {
+            'schema': {{ schema|dump|safe }},
+            {% if page.data %}
+                'formData': {{ page.data|dump|safe }},
+            {% endif %}
+            'onSubmit': function (data) {
+                reqwest({
+                    'url': '/edit/{{ repoId }}/{{ page.id }}',
+                    'method': 'post',
+                    'type': 'json',
+                    'contentType': 'application/json',
+                    'data': JSON.stringify(data.formData)
+                }).then(function (resp) {
+                    console.log('here');
+                });
+            }
+        }),
+        document.getElementById('edit_{{ page.id }}')
+    );
+{% endfor %}
+</script>
+{% endblock %}

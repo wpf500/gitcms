@@ -6,7 +6,9 @@ import expressNunjucks from 'express-nunjucks';
 import sassMiddleware from 'node-sass-middleware';
 
 import addRoutes from './routes/add';
-import { openDb } from './services/db';
+import editRoutes from './routes/edit';
+
+import * as db from './services/db';
 
 const app = express();
 const isDev = app.get('env') === 'development';
@@ -17,6 +19,7 @@ expressNunjucks(app, {
 });
 
 app.use(bodyParser.urlencoded({'extended': true}));
+app.use(bodyParser.json());
 
 app.use(sassMiddleware({
     'src': __dirname,
@@ -25,11 +28,12 @@ app.use(sassMiddleware({
 app.use('/public', express.static(path.join(__dirname, 'build/public')));
 
 addRoutes(app);
+editRoutes(app);
 
 app.get('/', (req, res) => {
     res.render('index');
 });
 
-openDb().then(app.listen(3000, () => {
+db.open().then(() => app.listen(3000, () => {
     console.log('Listening on 3000');
 }));

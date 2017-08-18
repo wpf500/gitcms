@@ -3,12 +3,15 @@
 <head>
     <meta charset="utf8" />
     <title>GitCMS</title>
-    <link rel="stylesheet" href="public/stylesheets/style.css" />
+    <link rel="stylesheet" href="/public/stylesheets/style.css" />
 </head>
 <body>
     <div class="container">
         {% block content %}
         {% endblock %}
     </div>
+
+    {% block javascripts %}
+    {% endblock %}
 </body>
 </html>
