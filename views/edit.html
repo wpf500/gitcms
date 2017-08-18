@@ -2,7 +2,9 @@
 
 {% block content %}
 <h1>Select a project</h1>
+<ul>
 {% for repo in repos %}
-    <h3><a href="/edit/{{ repo.id }}">{{ repo.name }}</a></h3>
+    <li><h3><a href="/edit/{{ repo.id }}">{{ repo.name }}</a></h3></li>
 {% endfor %}
+</ul>
 {% endblock %}
