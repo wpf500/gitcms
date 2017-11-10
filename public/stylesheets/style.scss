@@ -1,2 +1,10 @@
 @import "../../node_modules/bootstrap/dist/css/bootstrap";
 
+fieldset {
+  padding: .35em .625em .75em;
+  border: 1px solid #dfdfdf;
+}
+
+legend {
+  border-bottom: 0;
+}
