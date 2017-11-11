@@ -1,20 +1,23 @@
-import keygen from 'ssh-keygen2';
-import { cloneRepo } from '../services/repo';
+var express = require('express');
+var keygen = require('ssh-keygen2');
+var { cloneRepo } = require('../services/repo');
 
-export default function (app) {
-    app.route('/add')
-        .get((req, res) => {
-            keygen((err, keypair) => {
-                res.render('add', keypair);
-            });
-        })
-        .post((req, res) => {
-            const {repoUrl, repoName, privateKey, publicKey} = req.body;
-            cloneRepo(repoUrl, repoName, publicKey, privateKey).then(repo => {
-                res.send('success!');
-            }).catch(err => {
-                console.log(err);
-                res.send('error!');
-            });
-        });
-}
+const router = express.Router();
+
+router.get('/', (req, res) => {
+  keygen((err, keypair) => {
+    res.render('add', keypair);
+  });
+});
+
+router.post('/', (req, res) => {
+  const {repoUrl, repoName, privateKey, publicKey} = req.body;
+  cloneRepo(repoUrl, repoName, publicKey, privateKey).then(repo => {
+    res.send('success!');
+  }).catch(err => {
+    console.log(err);
+    res.send('error!');
+  });
+});
+
+module.exports = router;

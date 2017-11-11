@@ -1,24 +1,22 @@
-import path from 'path';
+var path = require('path');
 
-import basicAuth from 'express-basic-auth';
-import bodyParser from 'body-parser';
-import express from 'express';
-import expressNunjucks from 'express-nunjucks';
-import sassMiddleware from 'node-sass-middleware';
+var basicAuth = require('express-basic-auth');
+var bodyParser = require('body-parser');
+var express = require('express');
+var expressNunjucks = require('express-nunjucks');
+var sassMiddleware = require('node-sass-middleware');
 
-import addRoutes from './routes/add';
-import editRoutes from './routes/edit';
+var routes = require('./routes');
+var db = require('./services/db');
 
-import * as db from './services/db';
-
-import auth from './auth.json';
+var auth = require('./auth.json');
 
 const app = express();
 const isDev = app.get('env') === 'development';
 
 app.set('views', path.join(__dirname, 'views'));
 expressNunjucks(app, {
-    'watch': isDev, 'noCache': isDev
+  'watch': isDev, 'noCache': isDev
 });
 
 app.use(basicAuth({'users': auth, 'challenge': true}));
@@ -27,18 +25,13 @@ app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
 
 app.use(sassMiddleware({
-    'src': __dirname,
-    'dest': path.join(__dirname, 'build')
+  'src': __dirname,
+  'dest': path.join(__dirname, 'build')
 }));
 app.use('/public', express.static(path.join(__dirname, 'build/public')));
 
-addRoutes(app);
-editRoutes(app);
-
-app.get('/', (req, res) => {
-    res.redirect('/edit');
-});
+app.use('/', routes);
 
 db.open().then(() => app.listen(3000, () => {
-    console.log('Listening on 3000');
+  console.log('Listening on 3000');
 }));

@@ -1,27 +1,23 @@
-import { openRepo, writeRepo } from '../services/repo';
-import { listRepos } from '../services/db';
+var express = require('express');
 
-async function handleGet(req, res) {
-    const repo = await openRepo(req.params.id);
-    res.render('edit-repo', repo);
-}
+var { openRepo, writeRepo } = require('../services/repo');
+var { listRepos } = require('../services/db');
 
-async function handlePost(req, res) {
-    const oid = await writeRepo(req.params.id, req.params.page, req.body);
-    res.send(oid);
-}
+const router = express.Router();
 
-export default function (app) {
-    app.route('/edit/:id')
-        .get(handleGet);
+router.get('/:id', async (req, res) => {
+  const repo = await openRepo(req.params.id);
+  res.render('edit-repo', repo);
+});
 
-    app.route('/edit/:id/:page')
-        .post(handlePost);
+router.post('/edit/:id/:page', async (req, res) => {
+  const oid = await writeRepo(req.params.id, req.params.page, req.body);
+  res.send(oid);
+});
 
-    app.route('/edit')
-        .get((req, res) => {
-            listRepos().then(repos => {
-                res.render('edit', {repos});
-            });
-        });
-}
+router.get('/', async (req, res) => {
+  const repos = await listRepos();
+  res.render('edit', {repos});
+});
+
+module.exports = router;
