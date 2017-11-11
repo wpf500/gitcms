@@ -20,8 +20,10 @@
   },
   "homepage": "https://github.com/wpf500/gitcms#readme",
   "devDependencies": {
+    "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.5.2",
+    "babel-preset-react": "^6.24.1",
     "concurrently": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-sass": "^3.1.0",
@@ -30,7 +32,6 @@
     "webpack-stream": "^4.0.0"
   },
   "dependencies": {
-    "babel-core": "^6.26.0",
     "body-parser": "^1.17.2",
     "bootstrap": "^3.3.7",
     "express": "^4.15.3",
@@ -39,7 +40,17 @@
     "mz": "^2.6.0",
     "nodegit": "^0.18.3",
     "nunjucks": "^3.0.1",
+    "react": "^16.1.0",
+    "react-bootstrap": "^0.31.5",
+    "react-dom": "^16.1.0",
+    "react-jsonschema-form": "^1.0.0",
     "sqlite": "^2.8.0",
     "ssh-keygen2": "^0.1.0"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "package.json",
+      "public/**/*"
+    ]
   }
 }
