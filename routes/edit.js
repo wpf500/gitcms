@@ -10,7 +10,7 @@ router.get('/:id', async (req, res) => {
   res.render('edit-repo', repo);
 });
 
-router.post('/edit/:id/:page', async (req, res) => {
+router.post('/:id/:page', async (req, res) => {
   const oid = await writeRepo(req.params.id, req.params.page, req.body);
   res.send(oid);
 });
