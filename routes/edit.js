@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/:id', async (req, res) => {
   const repo = await openRepo(req.params.id);
-  res.render('edit-repo', repo);
+  res.render('edit/edit', repo);
 });
 
 router.post('/:id/:page', async (req, res) => {
@@ -17,7 +17,7 @@ router.post('/:id/:page', async (req, res) => {
 
 router.get('/', async (req, res) => {
   const repos = await listRepos();
-  res.render('edit', {repos});
+  res.render('edit/list', {repos});
 });
 
 module.exports = router;
