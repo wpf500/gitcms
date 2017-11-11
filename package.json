@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ."
+    "web": "nodemon .",
+    "assets": "gulp",
+    "start": "concurrently \"npm run web\" \"npm run assets\""
   },
   "repository": {
     "type": "git",
@@ -18,18 +20,23 @@
   },
   "homepage": "https://github.com/wpf500/gitcms#readme",
   "devDependencies": {
-    "babel-cli": "^6.24.1",
+    "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.5.2",
-    "nodemon": "^1.12.1"
+    "concurrently": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-sass": "^3.1.0",
+    "nodemon": "^1.12.1",
+    "webpack": "^3.8.1",
+    "webpack-stream": "^4.0.0"
   },
   "dependencies": {
+    "babel-core": "^6.26.0",
     "body-parser": "^1.17.2",
     "bootstrap": "^3.3.7",
     "express": "^4.15.3",
     "express-basic-auth": "^1.1.2",
     "express-nunjucks": "^2.2.3",
     "mz": "^2.6.0",
-    "node-sass-middleware": "^0.11.0",
     "nodegit": "^0.18.3",
     "nunjucks": "^3.0.1",
     "sqlite": "^2.8.0",
