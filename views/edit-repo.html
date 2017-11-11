@@ -6,10 +6,8 @@
         min-height: 200px;
     }
 
-    .page {
-        margin-top: 4rem;
-        padding-top: 2rem;
-        border-top: 3px solid #333;
+    .tab-pane {
+        padding-top: 20px;
     }
 </style>
 {% endblock %}
@@ -17,29 +15,36 @@
 {% block content %}
 <h1>{{ dbRepo.name }}</h1>
 
-<h4>
-    Jump to&nbsp;&nbsp;
-{% for page in pages %}
-    <a class="btn btn-primary btn-lg" href="#edit_{{ page.id }}">{{ page.name }}</a>
-{% endfor %}
-</h4>
+<ul class="nav nav-tabs">
+    {% for page in pages %}
+        <li class="nav-item {% if loop.first %}active{% endif %}">
+            <a class="nav-link" data-toggle="tab" href="#{{ page.id }}">
+                {{ page.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
 
+<div class="tab-content">
 {% for page in pages %}
-    <h2 class="page" id="edit_{{ page.id}}">{{ page.name }}</h2>
-    <div id="edit_{{ page.id }}_form"></div>
-    <div id="edit_{{ page.id }}_saving" class="alert alert-warning hidden">
-        <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-        Saving update&hellip;
-    </div>
-    <div id="edit_{{ page.id }}_success" class="alert alert-success hidden">
-        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-        Update saved
-    </div>
-    <div id="edit_{{ page.id }}_failure" class="alert alert-danger hidden">
-        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-        Update failed
+    <div class="tab-pane {% if loop.first %}active{% endif %}" id="{{ page.id }}">
+        <div id="edit_{{ page.id }}_form"></div>
+        <div id="edit_{{ page.id }}_saving" class="alert alert-warning hidden">
+            <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+            Saving update&hellip;
+        </div>
+        <div id="edit_{{ page.id }}_success" class="alert alert-success hidden">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            Update saved
+        </div>
+        <div id="edit_{{ page.id }}_failure" class="alert alert-danger hidden">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            Update failed
+        </div>
     </div>
 {% endfor %}
+</div>
+
 {% endblock %}
 
 {% block javascripts %}
@@ -47,6 +52,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js"></script>
 <script src="https://unpkg.com/react-jsonschema-form/dist/react-jsonschema-form.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reqwest/2.0.5/reqwest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
     function onSubmit(pageId, data) {
         var savingEl = document.getElementById('edit_' + pageId + '_saving');
