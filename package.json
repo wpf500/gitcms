@@ -56,7 +56,8 @@
   "nodemonConfig": {
     "ignore": [
       "package.json",
-      "public/**/*"
+      "public/**/*",
+      "repos/**/*"
     ]
   }
 }
