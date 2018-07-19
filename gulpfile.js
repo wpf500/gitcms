@@ -15,7 +15,10 @@ gulp.task('css', function () {
 
 gulp.task('js', function () {
   return gulp.src('./public/javascripts/main.js')
-    .pipe(gulpWebpack(require('./webpack.config.js'), webpack))
+    .pipe(gulpWebpack(require('./webpack.config.js'), webpack).on('error', function (error) {
+      console.log(error);
+      this.emit('end');
+    }))
     .pipe(gulp.dest('./build/public/javascripts'));
 });
 

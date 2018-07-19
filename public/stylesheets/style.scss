@@ -8,3 +8,15 @@ fieldset {
 legend {
   border-bottom: 0;
 }
+
+.sticky-alert {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  padding: 10px 0;
+  background-color: white;
+
+  & > .alert {
+    margin-bottom: 0;
+  }
+}
