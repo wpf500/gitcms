@@ -20,7 +20,7 @@ expressNunjucks(app, {
   'watch': isDev, 'noCache': isDev
 });
 
-app.use(morgan('dev'));
+app.use(morgan(':date[iso] :method :url :status :response-time ms - :res[content-length]'));
 app.use(basicAuth({'users': auth, 'challenge': true}));
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
