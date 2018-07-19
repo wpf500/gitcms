@@ -2,6 +2,7 @@ const path = require('path');
 
 const basicAuth = require('express-basic-auth');
 const bodyParser = require('body-parser');
+const compression = require('compression');
 const express = require('express');
 const expressNunjucks = require('express-nunjucks');
 const morgan = require('morgan');
@@ -20,11 +21,10 @@ expressNunjucks(app, {
 });
 
 app.use(morgan('dev'));
-
 app.use(basicAuth({'users': auth, 'challenge': true}));
-
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
+app.use(compression());
 
 app.use('/public', express.static(path.join(__dirname, 'build/public')));
 
