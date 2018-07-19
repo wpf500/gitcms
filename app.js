@@ -1,14 +1,15 @@
-var path = require('path');
+const path = require('path');
 
-var basicAuth = require('express-basic-auth');
-var bodyParser = require('body-parser');
-var express = require('express');
-var expressNunjucks = require('express-nunjucks');
+const basicAuth = require('express-basic-auth');
+const bodyParser = require('body-parser');
+const express = require('express');
+const expressNunjucks = require('express-nunjucks');
+const morgan = require('morgan');
 
-var routes = require('./routes');
-var db = require('./services/db');
+const routes = require('./routes');
+const db = require('./services/db');
 
-var auth = require('./auth.json');
+const auth = require('./auth.json');
 
 const app = express();
 const isDev = app.get('env') === 'development';
@@ -17,6 +18,8 @@ app.set('views', path.join(__dirname, 'views'));
 expressNunjucks(app, {
   'watch': isDev, 'noCache': isDev
 });
+
+app.use(morgan('dev'));
 
 app.use(basicAuth({'users': auth, 'challenge': true}));
 

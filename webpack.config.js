@@ -5,6 +5,7 @@ var isProd = process.env.NODE_ENV === 'production';
 var plugins =  isProd ? [new webpack.optimize.UglifyJsPlugin()] : [];
 
 module.exports = {
+    devtool: 'source-map',
     entry: './public/javascripts/main.js',
     output: {
         filename: 'main.js'

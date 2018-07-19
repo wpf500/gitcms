@@ -1,52 +1,33 @@
+import axios from 'axios';
 import React from 'react';
-import ReactDOM from 'react-dom';
-
-import Form from 'react-jsonschema-form';
 import {Tabs, Tab} from 'react-bootstrap';
+import ReactDOM from 'react-dom';
+import Form from 'react-jsonschema-form';
+import extrasFields from 'react-jsonschema-form-extras';
 
-function onSubmit(pageId, data) {
-  var savingEl = document.getElementById('edit_' + pageId + '_saving');
-  var successEl = document.getElementById('edit_' + pageId + '_success');
-  var failureEl = document.getElementById('edit_' + pageId + '_failure');
-
-  savingEl.classList.remove('hidden');
-  successEl.classList.add('hidden');
-  failureEl.classList.add('hidden');
-
-  reqwest({
-    'url': '/edit/{{ dbRepo.id }}/' + pageId,
-    'method': 'post',
-    'type': 'json',
-    'contentType': 'application/json',
-    'data': JSON.stringify(data.formData)
-  }).then(function (resp) {
-    savingEl.classList.add('hidden');
-    successEl.classList.remove('hidden');
-  }, function () {
-    savingEl.classList.add('hidden');
-    failureEl.classList.remove('hidden');
-  });
-}
+const fields = extrasFields;
 
 class GitCMS extends React.Component {
-  constructor() {
-    this.state = {
-      'pages': this.props.pages
-    };
+  constructor(props) {
+    super(props);
   }
 
-  onChange(page, data) {
+  onSubmit(page, data) {
+    console.log(page, data);
+    axios.post(`/edit/${this.props.dbRepoId}/${page.id}`, data.formData).then(resp => {
+      console.log(resp);
+    });
   }
 
   render() {
-    const {schema, uiSchema} = this.props;
-    const {pages} = this.state;
+    const {schema, uiSchema, pages} = this.props;
 
     return (
       <Tabs id="pages">
         {pages.map(page => (
           <Tab eventKey={page.id} key={page.id} title={page.name}>
-            <Form schema={schema} uiSchema={uiSchema} formData={page.data}>
+            <Form schema={schema} uiSchema={uiSchema} formData={page.data} fields={fields}
+                  onSubmit={this.onSubmit.bind(this, page)}>
             </Form>
           </Tab>
         ))}
