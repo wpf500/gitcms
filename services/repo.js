@@ -39,11 +39,19 @@ async function openRepo(repoId, branch) {
   const repoDir = getRepoDir(dbRepo.url);
   const repo = await Git.Repository.open(repoDir);
 
-  await repo.checkoutBranch(branch);
-
   const fetchOpts = await getFetchOpts(dbRepo.publicKey, dbRepo.privateKey);
-  await repo.fetchAll(fetchOpts)
-  await repo.mergeBranches(branch, 'origin/' + branch);
+  await repo.fetchAll(fetchOpts);
+
+  try {
+    await repo.checkoutBranch(branch);
+    await repo.mergeBranches(branch, 'origin/' + branch);
+  } catch (err) {
+    console.error('Fetching new branch');
+    const ref = await repo.createBranch(branch, await repo.getHeadCommit(), false);
+    await repo.checkoutBranch(ref);
+    const commit = await repo.getReferenceCommit('refs/remotes/origin/' + branch);
+    await Git.Reset.reset(repo, commit, Git.Reset.TYPE.HARD, {});
+  }
 
   const def = JSON.parse(await fs.readFile(path.join(repoDir, '.gitcms.json')));
 
