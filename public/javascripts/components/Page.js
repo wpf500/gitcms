@@ -21,12 +21,12 @@ class Page extends React.Component {
   }
 
   onSave() {
-    const {dbRepoId, page} = this.props;
+    const {page} = this.props;
     const {formData} = this.state;
 
     this.setState({isSaving: true, isSuccess: false, error: null});
 
-    axios.post(`/edit/${dbRepoId}/${page.id}`, formData)
+    axios.post(window.location.href + '/' + page.id, formData)
       .then(() => this.setState({isSuccess: true, hasChanged: false}))
       .catch(error => this.setState({error}))
       .then(() => this.setState({isSaving: false}));

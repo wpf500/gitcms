@@ -33,15 +33,17 @@ async function loadPage(repoDir, page) {
   }
 }
 
-async function openRepo(repoId) {
+async function openRepo(repoId, branch) {
   const dbRepo = await db.fetchRepo(repoId);
 
   const repoDir = getRepoDir(dbRepo.url);
   const repo = await Git.Repository.open(repoDir);
 
+  await repo.checkoutBranch(branch);
+
   const fetchOpts = await getFetchOpts(dbRepo.publicKey, dbRepo.privateKey);
   await repo.fetchAll(fetchOpts)
-  await repo.mergeBranches('master', 'origin/master');
+  await repo.mergeBranches(branch, 'origin/' + branch);
 
   const def = JSON.parse(await fs.readFile(path.join(repoDir, '.gitcms.json')));
 
@@ -52,8 +54,10 @@ async function openRepo(repoId) {
   return {repo, repoDir, dbRepo, pages, schema, uiSchema};
 }
 
-async function writeRepo(repoId, pageId, data) {
-  const {repo, repoDir, dbRepo, pages} = await openRepo(repoId);
+async function writeRepo(repoId, branch, pageId, data) {
+  const {repo, repoDir, dbRepo, pages} = await openRepo(repoId, branch);
+
+  await repo.checkoutBranch(branch);
 
   const page = pages.find(page => page.id === pageId);
   await fs.writeFile(path.join(repoDir, page.file), JSON.stringify(data, null, 2));
@@ -64,7 +68,7 @@ async function writeRepo(repoId, pageId, data) {
 
   const remote = await repo.getRemote('origin');
   const fetchOpts = await getFetchOpts(dbRepo.publicKey, dbRepo.privateKey);
-  await remote.push(['refs/heads/master:refs/heads/master'], fetchOpts);
+  await remote.push([`refs/heads/${branch}:refs/heads/${branch}`], fetchOpts);
 
   return oid;
 }
