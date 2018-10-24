@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "web": "nodemon .",
     "assets": "gulp",
-    "start": "concurrently \"npm run web\" \"npm run assets\""
+    "start": "concurrently \"npm run web\" \"npm run assets\"",
+    "build": "NODE_ENV=production gulp build"
   },
   "repository": {
     "type": "git",
