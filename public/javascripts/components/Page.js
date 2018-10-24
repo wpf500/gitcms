@@ -14,8 +14,14 @@ class Page extends React.Component {
       formData: props.page.data
     };
 
+    this.onClearError = this.onClearError.bind(this);
     this.onSave = this.onSave.bind(this);
+    this.onRevert = this.onRevert.bind(this);
     this.onChange = this.onChange.bind(this);
+  }
+
+  onClearError() {
+    this.setState({error: null});
   }
 
   onSave() {
@@ -25,9 +31,21 @@ class Page extends React.Component {
     this.setState({isSaving: true, isSuccess: false, error: null});
 
     axios.post(window.location.href + '/' + page.id, formData)
-      .then(() => this.setState({isSuccess: true, hasChanged: false}))
-      .catch(error => this.setState({error}))
+      .then(() => {
+        this.setState({isSuccess: true, hasChanged: false});
+        setTimeout(() => this.setState({isSuccess: false}), 5000);
+      })
+      .catch(error => {
+        console.error(error);
+        this.setState({error});
+      })
       .then(() => this.setState({isSaving: false}));
+  }
+
+  onRevert() {
+    if (confirm('Are you sure you want to revert all changes?')) {
+      this.setState({formData: this.props.page.data, hasChanged: false});
+    }
   }
 
   onChange({formData}) {
@@ -38,26 +56,45 @@ class Page extends React.Component {
     const {schema, uiSchema} = this.props;
     const {formData, isSaving, hasChanged, isSuccess, error} = this.state;
 
+    const clazz = 'page-container' + (isSaving ? ' is-saving' : '');
+
     return (
-      <div className="page-container">
+      <div className={clazz}>
         <Form schema={schema} uiSchema={uiSchema} formData={formData} fields={fields}
               onChange={this.onChange}>
-          {isSuccess && <Alert bsStyle="success">Changes saved</Alert>}
-          {error && <Alert bsStyle="danger">Changes could not be saved</Alert>}
-          {hasChanged &&
-            <div className="page-save">
+          <div />
+        </Form>
+        {(isSuccess || error || hasChanged) &&
+          <div className="page-save">
+            {isSuccess && <Alert bsStyle="success">Changes saved</Alert>}
+            {error &&
+              <Alert bsStyle="danger">
+                <div className="clearfix">
+                  <div className="pull-right">
+                    <Button bsStyle="danger" onClick={this.onClearError}>Clear</Button>
+                  </div>
+                  Changes could not be saved: {error.message}
+                </div>
+              </Alert>}
+            {hasChanged &&
               <Alert bsStyle="info">
                 <div className="clearfix">
                   <div className="pull-right">
+                    {!isSaving &&
+                      <span>
+                        <Button bsStyle="default" bsSize="small" onClick={this.onRevert}>
+                          Revert
+                        </Button>
+                        {' '}
+                      </span>}
                     <Button bsStyle="primary" onClick={this.onSave} disabled={isSaving}>
                       {isSaving ? 'Saving...' : 'Save'}
                     </Button>
                   </div>
                   Unsaved changes
                 </div>
-              </Alert>
-            </div>}
-        </Form>
+              </Alert>}
+          </div>}
       </div>
     );
   }

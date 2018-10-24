@@ -33,6 +33,11 @@ legend {
 
 .page-container {
   padding-bottom: 80px; // Space for save box
+
+  &.is-saving form {
+    pointer-events: none;
+    opacity: 0.4;
+  }
 }
 
 .page-save {
