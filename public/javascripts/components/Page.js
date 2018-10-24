@@ -4,8 +4,6 @@ import {Alert, Button, Tab} from 'react-bootstrap';
 import Form from 'react-jsonschema-form';
 import extrasFields from 'react-jsonschema-form-extras';
 
-import StickyAlert from './StickyAlert';
-
 const fields = extrasFields;
 
 class Page extends React.Component {
@@ -41,15 +39,24 @@ class Page extends React.Component {
     const {formData, isSaving, hasChanged, isSuccess, error} = this.state;
 
     return (
-      <div>
-        {hasChanged && <StickyAlert bsStyle="warning">Unsaved changes</StickyAlert>}
+      <div className="page-container">
         <Form schema={schema} uiSchema={uiSchema} formData={formData} fields={fields}
               onChange={this.onChange}>
           {isSuccess && <Alert bsStyle="success">Changes saved</Alert>}
           {error && <Alert bsStyle="danger">Changes could not be saved</Alert>}
-          <Button bsStyle="primary" bsSize="large" onClick={this.onSave} disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
+          {hasChanged &&
+            <div className="page-save">
+              <Alert bsStyle="info">
+                <div className="clearfix">
+                  <div className="pull-right">
+                    <Button bsStyle="primary" onClick={this.onSave} disabled={isSaving}>
+                      {isSaving ? 'Saving...' : 'Save'}
+                    </Button>
+                  </div>
+                  Unsaved changes
+                </div>
+              </Alert>
+            </div>}
         </Form>
       </div>
     );

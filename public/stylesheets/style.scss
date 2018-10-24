@@ -20,3 +20,29 @@ legend {
     margin-bottom: 0;
   }
 }
+
+.page-tabs {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-bottom: -20px;
+  background-color: white;
+}
+
+.page-container {
+  padding-bottom: 80px; // Space for save box
+}
+
+.page-save {
+  @extend .container;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  line-height: 34px;
+  padding-top: 20px;
+  background-color: white;
+}
