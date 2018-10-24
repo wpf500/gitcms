@@ -19,15 +19,16 @@
 
 {% block content %}
 <h1>{{ dbRepo.name }}</h1>
+<p>You are editing the {{ branch }} branch</p>
 <div id="content"></div>
 {% endblock %}
 
 {% block javascripts %}
 <script>
     window.GitCMS = {
-        'schema': {{ schema|dump|safe }},
-        'uiSchema': {{ uiSchema|dump|safe }},
-        'pages': {{ pages|dump|safe }}
+        'schema': {{ repo.schema|dump|safe }},
+        'uiSchema': {{ repo.uiSchema|dump|safe }},
+        'pages': {{ repo.pages|dump|safe }}
     };
 </script>
 <script src="/public/javascripts/main.js"></script>

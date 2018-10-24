@@ -16,7 +16,7 @@ router.get('/:id/:branch', asyncHandler(async (req, res) => {
   const dbRepo = await db.fetchRepo(id, user);
   const repo = await openRepo(dbRepo, branch);
 
-  res.render('edit/edit', {...repo, dbRepo});
+  res.render('edit/edit', {repo, dbRepo, branch});
 }));
 
 router.post('/:id/:branch/:page/', asyncHandler(async (req, res) => {
