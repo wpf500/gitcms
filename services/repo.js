@@ -1,16 +1,14 @@
-var path = require('path');
-var fs = require('mz/fs');
-var crypto = require('crypto');
-var Git = require('nodegit');
-
-var db = require('./db');
+const path = require('path');
+const fs = require('mz/fs');
+const crypto = require('crypto');
+const Git = require('nodegit');
 
 function getRepoId(repoUrl) {
    return crypto.createHash('sha1').update(repoUrl).digest('hex');
 }
 
-function getRepoDir(repoUrl) {
-  return path.join(__dirname, '../repos', getRepoId(repoUrl));
+function getRepoDir(repoId) {
+  return path.join(__dirname, '../repos', repoId);
 }
 
 async function getFetchOpts(publicKey, privateKey) {
@@ -33,10 +31,8 @@ async function loadPage(repoDir, page) {
   }
 }
 
-async function openRepo(repoId, branch) {
-  const dbRepo = await db.fetchRepo(repoId);
-
-  const repoDir = getRepoDir(dbRepo.url);
+async function openRepo(dbRepo, branch) {
+  const repoDir = getRepoDir(dbRepo.id);
   const repo = await Git.Repository.open(repoDir);
 
   const fetchOpts = await getFetchOpts(dbRepo.publicKey, dbRepo.privateKey);
@@ -59,18 +55,16 @@ async function openRepo(repoId, branch) {
   const uiSchema = def.uiSchema;
   const pages = await Promise.all(def.pages.map(loadPage.bind(null, repoDir)));
 
-  return {repo, repoDir, dbRepo, pages, schema, uiSchema};
+  return {repo, repoDir, pages, schema, uiSchema};
 }
 
-async function writeRepo(repoId, branch, pageId, data) {
-  const {repo, repoDir, dbRepo, pages} = await openRepo(repoId, branch);
-
-  await repo.checkoutBranch(branch);
+async function writeRepo(dbRepo, branch, pageId, data) {
+  const {repo, repoDir, pages} = await openRepo(dbRepo, branch);
 
   const page = pages.find(page => page.id === pageId);
   await fs.writeFile(path.join(repoDir, page.file), JSON.stringify(data, null, 2));
 
-  var author = Git.Signature.now("GitCMS", "gitcms@test.com");
+  const author = Git.Signature.now("GitCMS", "gitcms@test.com");
   const oid = await repo.createCommitOnHead([page.file], author, author,
     `Updated ${page.id}`);
 
@@ -81,19 +75,17 @@ async function writeRepo(repoId, branch, pageId, data) {
   return oid;
 }
 
-async function cloneRepo(repoUrl, repoName, publicKey, privateKey) {
+async function cloneRepo(repoUrl, publicKey, privateKey) {
   const repoId = getRepoId(repoUrl);
-  const repoDir = getRepoDir(repoUrl);
+  const repoDir = getRepoDir(repoId);
 
   const exists = await fs.exists(repoDir);
   if (exists) {
     throw new Exception("Already exists!");
   } else {
     const fetchOpts = await getFetchOpts(publicKey, privateKey);
-    const repo = await Git.Clone(repoUrl, repoDir, {fetchOpts});
-    db.addRepo(repoId, repoName, repoUrl, publicKey, privateKey);
-
-    return repo;
+    await Git.Clone(repoUrl, repoDir, {fetchOpts});
+    return repoId;
   }
 }
 

@@ -1,12 +1,9 @@
-var express = require('express');
-
-var add = require('./add');
-var edit = require('./edit');
+const express = require('express');
 
 const router = express.Router();
 
-router.use('/add', add);
-router.use('/edit', edit);
+router.use('/add', require('./add'));
+router.use('/edit', require('./edit'));
 
 router.get('/', (req, res) => {
   res.redirect('/edit');
