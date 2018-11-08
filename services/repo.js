@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('mz/fs');
 const crypto = require('crypto');
 const Git = require('nodegit');
+const yaml = require('js-yaml');
 
 function getRepoId(repoUrl) {
    return crypto.createHash('sha1').update(repoUrl).digest('hex');
@@ -24,7 +25,7 @@ async function getFetchOpts(publicKey, privateKey) {
 
 async function loadPage(repoDir, page) {
   try {
-    const data = await fs.readFile(path.join(repoDir, page.file));
+    const data = await fs.readFile(path.join(repoDir, page.file), 'utf8');
     return Object.assign({}, page, {'data': JSON.parse(data)});
   } catch (e) {
     return page;
@@ -49,11 +50,14 @@ async function openRepo(dbRepo, branch) {
     await Git.Reset.reset(repo, commit, Git.Reset.TYPE.HARD, {});
   }
 
-  const def = JSON.parse(await fs.readFile(path.join(repoDir, '.gitcms.json')));
+  const defFile = path.join(repoDir, '.gitcms');
 
-  const schema = def.schema;
-  const uiSchema = def.uiSchema;
-  const pages = await Promise.all(def.pages.map(loadPage.bind(null, repoDir)));
+  const def = await fs.exists(defFile + '.yml') ?
+    yaml.safeLoad(await fs.readFile(defFile + '.yml', 'utf8')) :
+    JSON.parse(await fs.readFile(defFile + '.json', 'utf8'));
+
+  const {schema, uiSchema} = def;
+  const pages = await Promise.all(def.pages.map(page => loadPage(repoDir, page)));
 
   return {repo, repoDir, pages, schema, uiSchema};
 }
