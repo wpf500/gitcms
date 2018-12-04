@@ -56,10 +56,18 @@ async function openRepo(dbRepo, branch) {
     yaml.safeLoad(await fs.readFile(defFile + '.yml', 'utf8')) :
     JSON.parse(await fs.readFile(defFile + '.json', 'utf8'));
 
-  const {schema, uiSchema} = def;
+  // Upgrade version 1 def files
+  if (!def.version || def.version === 1) {
+    const {schema, uiSchema} = def;
+    def.pages.forEach(page => {
+      page.schema = schema;
+      page.uiSchema = uiSchema;
+    });
+  }
+
   const pages = await Promise.all(def.pages.map(page => loadPage(repoDir, page)));
 
-  return {repo, repoDir, pages, schema, uiSchema};
+  return {repo, repoDir, pages};
 }
 
 async function writeRepo(dbRepo, branch, pageId, data) {

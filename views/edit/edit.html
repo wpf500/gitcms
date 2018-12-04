@@ -26,8 +26,6 @@
 {% block javascripts %}
 <script>
     window.GitCMS = {
-        'schema': {{ repo.schema|dump|safe }},
-        'uiSchema': {{ repo.uiSchema|dump|safe }},
         'pages': {{ repo.pages|dump|safe }}
     };
 </script>
