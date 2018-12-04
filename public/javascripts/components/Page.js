@@ -53,7 +53,7 @@ class Page extends React.Component {
   }
 
   render() {
-    const {schema, uiSchema} = this.props;
+    const {schema, uiSchema} = this.props.page;
     const {formData, isSaving, hasChanged, isSuccess, error} = this.state;
 
     const clazz = 'page-container' + (isSaving ? ' is-saving' : '');
