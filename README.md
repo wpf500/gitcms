@@ -21,14 +21,13 @@ pages:
     file: "locale/ar.json"
     schema: &schema
     uiSchema: &uiSchema
-}
 ```
 
 Note `.gitcms.json` is also supported but not recommended as YAML anchors are
-very useful for deduplicating schema definitions
+very useful for deduplicating schema definitions.
 
 If no version number is given it is assumed to be version 1, which only
-supported the same `schema`/`uiSchema` definition for all pages
+supported the same `schema`/`uiSchema` definition for all pages.
 ```yaml
 version: 1
 pages:
