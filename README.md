@@ -11,23 +11,28 @@ pages:
   - id: "en",
     name: "English",
     file: "locale/en.json"
-    schema: *schema
+    schema: &schema
       ...
-    uiSchema: *uiSchema
+    uiSchema: &uiSchema
       ...
 
   - id: "ar",
     name: "Arabic",
     file: "locale/ar.json"
-    schema: &schema
-    uiSchema: &uiSchema
+    schema: *schema
+    uiSchema: *uiSchema
 ```
 
-Note `.gitcms.json` is also supported but not recommended as YAML anchors are
+See https://github.com/mozilla-services/react-jsonschema-form for details on
+`schema` and `uiSchema`. `uiSchema` is optional.
+
+`.gitcms.json` is also supported but not recommended as YAML anchors are
 very useful for deduplicating schema definitions.
 
+### Previous versions
+
 If no version number is given it is assumed to be version 1, which only
-supported the same `schema`/`uiSchema` definition for all pages.
+supports having the same `schema`/`uiSchema` definition for all pages.
 ```yaml
 version: 1
 pages:
@@ -38,14 +43,12 @@ pages:
   - id: "ar"
     name: "Arabic"
     file: "locale/ar.json"
+
 schema:
   ...
 uiSchema:
   ...
 ```
-
-See https://github.com/mozilla-services/react-jsonschema-form for details on
-`schema` and `uiSchema`. `uiSchema` is optional.
 
 ### To run
 
