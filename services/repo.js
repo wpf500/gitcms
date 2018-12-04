@@ -26,7 +26,7 @@ async function getFetchOpts(publicKey, privateKey) {
 async function loadPage(repoDir, page) {
   try {
     const data = await fs.readFile(path.join(repoDir, page.file), 'utf8');
-    return Object.assign({}, page, {'data': JSON.parse(data)});
+    return {...page, 'data': JSON.parse(data)};
   } catch (e) {
     return page;
   }

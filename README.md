@@ -49,8 +49,6 @@ See https://github.com/mozilla-services/react-jsonschema-form for details on
 
 ### To run
 
-Your verison of Node must support async/await (>7?)
-
 ```
 npm install
 node .
