@@ -30,6 +30,8 @@ app.use('/public', express.static(path.join(__dirname, 'build/public')));
 
 app.use('/', routes);
 
-db.open().then(() => app.listen(3000, () => {
-  console.log('Listening on 3000');
+const port = process.env.PORT || 3000;
+
+db.open().then(() => app.listen(port, () => {
+  console.log('Listening on ' + port);
 }));
