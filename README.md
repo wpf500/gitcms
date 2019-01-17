@@ -52,7 +52,16 @@ uiSchema:
 
 ### To run
 
+Create a `auth.json` file, this will be used for the Basic Auth challenge
+```json
+{
+    "username": "password",
+    ...
+}
+```
+
 ```
 npm install
+npm run build
 node .
 ```
