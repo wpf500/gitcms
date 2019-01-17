@@ -2,6 +2,24 @@
 
 A Git-based, JSON schema powered CMS
 
+## To run
+
+Create a `auth.json` file, this will be used for the Basic Auth challenge
+```json
+{
+    "username": "password",
+    ...
+}
+```
+
+```
+npm install
+npm run build
+node .
+```
+
+## How it works
+
 Repositories must have a `.gitcms.yml` file in their root with the following
 structure:
 
@@ -48,20 +66,4 @@ schema:
   ...
 uiSchema:
   ...
-```
-
-### To run
-
-Create a `auth.json` file, this will be used for the Basic Auth challenge
-```json
-{
-    "username": "password",
-    ...
-}
-```
-
-```
-npm install
-npm run build
-node .
 ```
