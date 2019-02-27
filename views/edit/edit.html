@@ -18,8 +18,16 @@
 {% endblock %}
 
 {% block content %}
+<p class="page-back">
+  <a class="btn btn-xs btn-default" href="/edit">
+    <span class="glyphicon glyphicon-arrow-left"></span> Back
+  </a>
+</p>
 <h1>{{ dbRepo.name }}</h1>
 <p>You are editing the {{ branch }} branch</p>
+<p>
+  <a class="btn btn-default" href="{{ dbRepo.liveUrl }}">View site</a>
+</p>
 <div id="content"></div>
 {% endblock %}
 
