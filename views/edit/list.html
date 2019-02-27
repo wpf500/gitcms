@@ -2,9 +2,24 @@
 
 {% block content %}
 <h1>Select a project</h1>
-<ul>
-{% for dbRepo in dbRepos %}
-    <li><h3><a href="/edit/{{ dbRepo.id }}">{{ dbRepo.name }}</a></h3></li>
-{% endfor %}
-</ul>
+<div class="row">
+  {% for dbRepo in dbRepos %}
+    <div class="col-sm-6 col-md-4">
+      <div class="thumbnail">
+        <img src="/repos/{{ dbRepo.id }}.jpg" alt="{{ dbRepo.name }}">
+        <div class="caption">
+          <h4>{{ dbRepo.name }}</h4>
+          <p>
+            <a class="btn btn-primary" href="/edit/{{ dbRepo.id }}">
+              Edit
+            </a>
+            <a class="btn btn-default" href="{{ dbRepo.liveUrl }}" target="_blank">
+              View site
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
 {% endblock %}

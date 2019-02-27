@@ -1,6 +1,4 @@
-npm-debug.log
 database.sqlite
 node_modules/
-/repos/
 /build/
 auth.json

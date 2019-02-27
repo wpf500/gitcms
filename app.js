@@ -27,6 +27,7 @@ app.use(bodyParser.json());
 app.use(compression());
 
 app.use('/public', express.static(path.join(__dirname, 'build/public')));
+app.use('/repos', express.static(path.join(__dirname, 'repos')));
 
 app.use('/', routes);
 
