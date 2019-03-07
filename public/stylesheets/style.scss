@@ -5,7 +5,20 @@ fieldset {
   border: 1px solid #dfdfdf;
 }
 
+fieldset#root {
+  padding: 0;
+  border: 0;
+}
+
+fieldset:focus-within {
+  border-color: #2e6da4;
+  & > legend {
+    color: #2e6da4;
+  }
+}
+
 legend {
+  padding: 0 5px;
   border-bottom: 0;
 }
 
