@@ -22,10 +22,10 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', asyncHandler(async (req, res) => {
-  const {repoUrl, repoName, repoUsers, privateKey, publicKey} = req.body;
+  const {repoUrl, repoLiveUrl, repoName, repoUsers, privateKey, publicKey} = req.body;
 
   const repoId = await cloneRepo(repoUrl, publicKey, privateKey);
-  await db.addRepo(repoId, repoName, repoUrl, ',' + repoUsers + ',', publicKey, privateKey);
+  await db.addRepo(repoId, repoName, repoUrl, repoLiveUrl, ',' + repoUsers + ',', publicKey, privateKey);
 
   res.redirect('/edit/' + repoId);
 }));
