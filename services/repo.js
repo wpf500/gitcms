@@ -93,7 +93,7 @@ async function cloneRepo(repoUrl, publicKey, privateKey) {
 
   const exists = await fs.exists(repoDir);
   if (exists) {
-    throw new Exception("Already exists!");
+    throw new Error("Already exists!");
   } else {
     const fetchOpts = await getFetchOpts(publicKey, privateKey);
     await Git.Clone(repoUrl, repoDir, {fetchOpts});
