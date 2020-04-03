@@ -1,10 +1,9 @@
-var webpack = require('webpack');
+const webpack = require('webpack');
 
-var isProd = process.env.NODE_ENV === 'production';
-
-var plugins =  isProd ? [new webpack.optimize.UglifyJsPlugin()] : [];
+const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = {
+    mode: isProd ? 'production' : 'development',
     devtool: 'source-map',
     entry: './public/javascripts/main.js',
     output: {
@@ -17,10 +16,9 @@ module.exports = {
             use: [{
                 loader: 'babel-loader',
                 options: {
-                    presets: ['env']
+                    presets: ['@babel/env', '@babel/react']
                 }
             }]
        }]
-    },
-    plugins: plugins
+    }
 };

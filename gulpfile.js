@@ -1,37 +1,41 @@
-var path = require('path');
-var gulp = require('gulp');
-var sass = require('gulp-sass');
+const path = require('path');
+const gulp = require('gulp');
+const sass = require('gulp-sass');
 
-var gulpWebpack = require('webpack-stream');
-var webpack = require('webpack');
+const gulpWebpack = require('webpack-stream');
+const webpack = require('webpack');
 
-var buildDir = './build';
+const buildDir = './build';
 
-gulp.task('css', function () {
+function css() {
   return gulp.src('./public/stylesheets/**/*')
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('./build/public/stylesheets'));
-});
+}
 
-gulp.task('js', function () {
+function js() {
   return gulp.src('./public/javascripts/main.js')
-    .pipe(gulpWebpack(require('./webpack.config.js'), webpack).on('error', function (error) {
-      console.log(error);
+    .pipe(gulpWebpack(require('./webpack.config.js'), webpack)
+    .on('error', error => {
+      console.error(error);
       this.emit('end');
     }))
     .pipe(gulp.dest('./build/public/javascripts'));
-});
+}
 
-gulp.task('fonts', function () {
+function fonts() {
   return gulp.src('./public/fonts/**/*')
     .pipe(gulp.dest('./build/public/fonts'));
-});
+}
 
-gulp.task('build', ['css', 'js', 'fonts']);
+const build = gulp.parallel(css, js, fonts);
 
-gulp.task('default', ['build'], function () {
-  var watcher = gulp.watch(['./public/**/*'], ['build']);
-  watcher.on('change', function (evt) {
+function watch() {
+  const watcher = gulp.watch(['./public/**/*'], build);
+  watcher.on('change', evt => {
     console.log('File ' + evt.path + ' was ' + evt.type);
   });
-});
+}
+
+exports.build = build;
+exports.default = gulp.series(build, watch);
