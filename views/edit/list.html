@@ -4,19 +4,17 @@
 <h1>Select a project</h1>
 <div class="row">
   {% for dbRepo in dbRepos %}
-    <div class="col-sm-6 col-md-4">
-      <div class="thumbnail">
-        <img src="/repos/{{ dbRepo.id }}.jpg" alt="{{ dbRepo.name }}">
-        <div class="caption">
-          <h4>{{ dbRepo.name }}</h4>
-          <p>
-            <a class="btn btn-primary" href="/edit/{{ dbRepo.id }}">
-              Edit
-            </a>
-            <a class="btn btn-default" href="{{ dbRepo.liveUrl }}" target="_blank">
-              View site
-            </a>
-          </p>
+    <div class="col-sm-6 col-md-4 mb-4">
+      <div class="card">
+        <img class="card-img-top" src="/repos/{{ dbRepo.id }}.jpg" alt="{{ dbRepo.name }}">
+        <div class="card-body">
+          <h4 class="card-title">{{ dbRepo.name }}</h4>
+          <a class="btn btn-primary" href="/edit/{{ dbRepo.id }}">
+            Edit
+          </a>
+          <a class="btn btn-default" href="{{ dbRepo.liveUrl }}" target="_blank">
+            View site
+          </a>
         </div>
       </div>
     </div>
