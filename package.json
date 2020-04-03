@@ -51,7 +51,7 @@
     "nodegit": "^0.26.5",
     "nunjucks": "^3.2.1",
     "react": "^16.13.1",
-    "react-bootstrap": "^1.0.0",
+    "react-bootstrap": "^0.32.4",
     "react-bootstrap-table": "^4.3.1",
     "react-bootstrap-typeahead": "^4.1.0",
     "react-day-picker": "^7.4.0",
