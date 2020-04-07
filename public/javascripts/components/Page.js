@@ -4,7 +4,12 @@ import {Alert, Button, Tab} from 'react-bootstrap';
 import Form from 'react-jsonschema-form';
 import extrasFields from 'react-jsonschema-form-extras';
 
-const fields = extrasFields;
+import ImageField from './ImageField';
+
+const fields = {
+  ...extrasFields,
+  image: ImageField
+};
 
 class Page extends React.Component {
   constructor(props) {
