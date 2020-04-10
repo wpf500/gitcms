@@ -34,7 +34,9 @@
 {% block javascripts %}
 <script>
     window.GitCMS = {
-        'pages': {{ repo.pages|dump|safe }}
+        'pages': {{ repo.pages|dump|safe }},
+        'branch': '{{ branch }}',
+        'repoId': '{{ dbRepo.id }}'
     };
 </script>
 <script src="/public/javascripts/main.js"></script>

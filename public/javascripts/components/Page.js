@@ -4,6 +4,8 @@ import {Alert, Button, Tab} from 'react-bootstrap';
 import Form from 'react-jsonschema-form';
 import extrasFields from 'react-jsonschema-form-extras';
 
+import PageContext from '../PageContext';
+
 import ImageField from './ImageField';
 
 const fields = {
@@ -23,6 +25,24 @@ class Page extends React.Component {
     this.onSave = this.onSave.bind(this);
     this.onRevert = this.onRevert.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.pageContext = {
+      registerSaveHandler: this.registerSaveHandler.bind(this)
+    };
+
+    this.saveHandlers = [];
+  }
+
+  registerSaveHandler(msg, handler) {
+    this.saveHandlers.push({msg, handler});
+  }
+
+  processSaveHandlers([saveHandler, ...saveHandlers]) {
+    this.setState({savingMessage: saveHandler.msg});
+    return saveHandler.handler(this.props).then(() => {
+      if (saveHandlers.length > 0) {
+        return this.processSaveHandlers(saveHandlers);
+      }
+    });
   }
 
   onClearError() {
@@ -30,21 +50,26 @@ class Page extends React.Component {
   }
 
   onSave() {
-    const {page} = this.props;
+    const {page, repoId, branch} = this.props;
     const {formData} = this.state;
 
     this.setState({isSaving: true, isSuccess: false, error: null});
 
-    axios.post(window.location.href + '/' + page.id, formData)
+    this.processSaveHandlers(this.saveHandlers)
+      .then(() => {
+        this.setState({savingMessage: 'Saving changes'});
+        //return axios.post(`/edit/${repoId}/${branch}/${page.id}`, formData)
+      })
       .then(() => {
         this.setState({isSuccess: true, hasChanged: false});
         setTimeout(() => this.setState({isSuccess: false}), 5000);
       })
       .catch(error => {
-        console.error(error);
         this.setState({error});
       })
-      .then(() => this.setState({isSaving: false}));
+      .then(() => {
+        this.setState({isSaving: false, savingMessage: ''});
+      });
   }
 
   onRevert() {
@@ -59,16 +84,18 @@ class Page extends React.Component {
 
   render() {
     const {schema, uiSchema} = this.props.page;
-    const {formData, isSaving, hasChanged, isSuccess, error} = this.state;
+    const {formData, isSaving, savingMessage, hasChanged, isSuccess, error} = this.state;
 
     const clazz = 'page-container' + (isSaving ? ' is-saving' : '');
 
     return (
       <div className={clazz}>
-        <Form schema={schema} uiSchema={uiSchema} formData={formData} fields={fields}
-              onChange={this.onChange}>
-          <div />
-        </Form>
+        <PageContext.Provider value={this.pageContext}>
+          <Form schema={schema} uiSchema={uiSchema} formData={formData} fields={fields}
+                onChange={this.onChange}>
+            <div />
+          </Form>
+        </PageContext.Provider>
         {(isSuccess || error || hasChanged) &&
           <div className="page-save">
             {isSuccess && <Alert bsStyle="success">Changes saved</Alert>}
@@ -93,7 +120,7 @@ class Page extends React.Component {
                         {' '}
                       </span>}
                     <Button bsStyle="primary" onClick={this.onSave} disabled={isSaving}>
-                      {isSaving ? 'Saving...' : 'Save'}
+                      {isSaving ? savingMessage : 'Save'}
                     </Button>
                   </div>
                   Unsaved changes

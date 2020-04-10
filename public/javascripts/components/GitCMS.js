@@ -3,7 +3,7 @@ import {Col, Nav, NavItem, Row, Tab} from 'react-bootstrap';
 
 import Page from './Page';
 
-const GitCMS = ({pages}) => (
+const GitCMS = ({pages, repoId, branch}) => (
   <Tab.Container id="pages" defaultActiveKey={pages[0].id}>
     <Row className="clearfix">
       <Col sm={12} className="page-tabs">
@@ -17,7 +17,7 @@ const GitCMS = ({pages}) => (
         <Tab.Content animation={false}>
           {pages.map(page => (
             <Tab.Pane eventKey={page.id} key={page.id}>
-              <Page page={page} />
+              <Page page={page} repoId={repoId} branch={branch} />
             </Tab.Pane>
           ))}
         </Tab.Content>
