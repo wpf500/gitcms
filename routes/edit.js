@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const busboy = require('connect-busboy');
 const express = require('express');
@@ -13,40 +14,42 @@ router.get('/:id', (req, res) => {
   res.redirect(req.originalUrl + '/master');
 });
 
-router.get('/:id/:branch', asyncHandler(async (req, res) => {
-  const {params: {id, branch}, auth: {user}} = req;
+const hasRepo = asyncHandler(async (req, res, next) => {
+  const dbRepo = await db.fetchRepo(req.params.id, req.auth.user);
+  if (dbRepo) {
+    req.dbRepo = dbRepo;
+    next();
+  } else {
+    next('route');
+  }
+});
 
-  const dbRepo = await db.fetchRepo(id, user);
+router.get('/:id/:branch', hasRepo, asyncHandler(async (req, res) => {
+  const {dbRepo, params: {branch}} = req;
   const repo = await openRepo(dbRepo, branch);
-
   res.render('edit/edit', {repo, dbRepo, branch});
 }));
 
-router.post('/:id/:branch/:page', asyncHandler(async (req, res) => {
-  const {body, params: {id, branch, page}, auth: {user}} = req;
-
-  const dbRepo = await db.fetchRepo(id, user);
-  if (dbRepo) {
-    const oid = await writeRepo(dbRepo, branch, page, body);
-    res.send(oid);
-  } else {
-    res.status(401).send('');
-  }
+router.post('/:id/:branch/:page', hasRepo, asyncHandler(async (req, res, next) => {
+  const {dbRepo, body, params: {branch, page}} = req;
+  const oid = await writeRepo(dbRepo, branch, page, body);
+  res.send(oid);
 }));
 
-router.post('/:id/:branch/:page/files', busboy(), (req, res) => {
-  let url;
+router.post('/:id/:branch/:page/files', hasRepo, busboy(), (req, res, next) => {
+  let filepath, filename;
 
   req.busboy.on('field', (fieldname, value) => {
-    if (fieldname === 'url') {
-      url = value;
-      console.log('Got URL', url);
+    if (fieldname === 'filepath') {
+      filepath = value;
+    } else if (fieldname === 'filename') {
+      filename = value;
     }
   });
 
   req.busboy.on('file', (fieldname, file) => {
-    console.log('Got file', file);
-    file.pipe(fs.createWriteStream(url));
+    const repoDir = getRepoDir(req.dbRepo.id);
+    file.pipe(fs.createWriteStream(path.join(repoDir, filepath, filename)));
   });
 
   req.busboy.on('finish', () => {

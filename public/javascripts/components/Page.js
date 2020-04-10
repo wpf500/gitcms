@@ -58,7 +58,7 @@ class Page extends React.Component {
     this.processSaveHandlers(this.saveHandlers)
       .then(() => {
         this.setState({savingMessage: 'Saving changes'});
-        //return axios.post(`/edit/${repoId}/${branch}/${page.id}`, formData)
+        return axios.post(`/edit/${repoId}/${branch}/${page.id}`, formData)
       })
       .then(() => {
         this.setState({isSuccess: true, hasChanged: false});

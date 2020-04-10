@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cropper from 'cropperjs';
 import React from 'react';
+import { Alert, ControlLabel, Panel, FormControl, FormGroup } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 
 import PageContext from '../PageContext';
@@ -15,7 +16,8 @@ class ImageField extends React.Component {
     super(props);
 
     this.state = {
-      imageUrl: this.props.url ? 'THE URL' : null
+      imageUrl: this.props.url ? 'THE URL' : null,
+      imageName: this.props.url ? 'THE NAME' : null
     };
 
     this.imageRef = React.createRef();
@@ -25,11 +27,14 @@ class ImageField extends React.Component {
   onChangeFile(evt) {
     const files = evt.target.files;
     if (files && files.length > 0) {
-      this.setState({
-        imageUrl: URL.createObjectURL(files[0])
-      });
+      const imageName = uuidv4() + '.' + fileExts[files[0].type];
       this.props.onChange({
-        url: uuidv4() + '.' + fileExts[files[0].type]
+        url: (this.props.uiSchema.urlPrefix || '') + imageName
+      });
+      this.setState({
+        imageUrl: URL.createObjectURL(files[0]),
+        imageName,
+        imageType: files[0].type
       });
     }
   }
@@ -44,10 +49,11 @@ class ImageField extends React.Component {
 
   onSave({page, repoId, branch}) {
     return new Promise(resolve => {
-      this.cropper.getCroppedCanvas().toBlob(resolve)
+      this.cropper.getCroppedCanvas().toBlob(resolve, this.state.imageType)
     }).then(blob => {
       let formData = new FormData();
-      formData.append('url', this.props.formData.url);
+      formData.append('filepath', this.props.uiSchema.uploadPath);
+      formData.append('filename', this.state.imageName);
       formData.append('file', blob);
       return axios.post(`/edit/${repoId}/${branch}/${page.id}/files`, formData);
     });
@@ -63,7 +69,9 @@ class ImageField extends React.Component {
         this.cropper.destroy();
       }
       if (this.state.imageUrl) {
+        const aspectRatio = this.props.uiSchema.aspectRatio;
         this.cropper = new Cropper(this.imageRef.current, {
+          aspectRatio: aspectRatio && aspectRatio[0] / aspectRatio[1],
           autoCropArea: 1,
           rotatable: false,
           viewMode: 1,
@@ -75,20 +83,23 @@ class ImageField extends React.Component {
 
   render() {
     const { imageUrl } = this.state;
-    const { name, idSchema, formData } = this.props;
+    const { name, idSchema, formData, uiSchema } = this.props;
 
     return (
       <div>
-        <label htmlFor={idSchema.$id}>{name}</label>
-        <div className="panel panel-default">
-          <div className="panel-body">
-            <input
-              className="form-control"
-              type="file"
-              id={idSchema.$id}
-              accept="image/png,image/jpeg"
-              onChange={this.onChangeFile.bind(this)}
-            />
+        <ControlLabel>{name}</ControlLabel>
+        <Panel>
+          <Panel.Body>
+            <FormGroup>
+              <FormControl
+                type="file"
+                id={idSchema.$id}
+                accept="image/png,image/jpeg"
+                onChange={this.onChangeFile.bind(this)}
+              />
+            </FormGroup>
+            {uiSchema.aspectRatio &&
+              <Alert>Fixed aspect ratio: {uiSchema.aspectRatio.join('/')}</Alert>}
             {imageUrl &&
               <div className="image-field-crop">
                 <img src={imageUrl} ref={this.imageRef} />
@@ -98,8 +109,8 @@ class ImageField extends React.Component {
                 <p>URL: {formData.url}</p>
                 <p>Width: {formData.width}, height: {formData.height}</p>
               </div>}
-          </div>
-        </div>
+          </Panel.Body>
+        </Panel>
       </div>
     );
   }
