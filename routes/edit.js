@@ -4,6 +4,7 @@ const path = require('path');
 const busboy = require('connect-busboy');
 const express = require('express');
 const asyncHandler = require('express-async-handler');
+const mime = require('mime-types');
 
 const { openRepo, writeRepo, getRepoDir } = require('../services/repo');
 const db = require('../services/db');
@@ -30,26 +31,32 @@ router.get('/:id/:branch', hasRepo, asyncHandler(async (req, res) => {
   res.render('edit/edit', {repo, dbRepo, branch});
 }));
 
-router.post('/:id/:branch/:page', hasRepo, asyncHandler(async (req, res, next) => {
+router.post('/:id/:branch/:page', hasRepo, asyncHandler(async (req, res) => {
   const {dbRepo, body, params: {branch, page}} = req;
   const oid = await writeRepo(dbRepo, branch, page, body);
   res.send(oid);
 }));
 
-router.post('/:id/:branch/:page/files', hasRepo, busboy(), (req, res, next) => {
-  let filepath, filename;
+router.get('/:id/:branch/:page/files', hasRepo, (req, res) => {
+  const {filepath} = req.query;
+  const repoDir = getRepoDir(req.dbRepo.id);
+  console.log(path.join(repoDir, filepath));
+  res.setHeader('content-type', mime.lookup(filepath));
+  fs.createReadStream(path.join(repoDir, filepath)).pipe(res);
+});
+
+router.post('/:id/:branch/:page/files', hasRepo, busboy(), (req, res) => {
+  let filepath;
 
   req.busboy.on('field', (fieldname, value) => {
     if (fieldname === 'filepath') {
       filepath = value;
-    } else if (fieldname === 'filename') {
-      filename = value;
     }
   });
 
   req.busboy.on('file', (fieldname, file) => {
     const repoDir = getRepoDir(req.dbRepo.id);
-    file.pipe(fs.createWriteStream(path.join(repoDir, filepath, filename)));
+    file.pipe(fs.createWriteStream(path.join(repoDir, filepath)));
   });
 
   req.busboy.on('finish', () => {

@@ -25,22 +25,26 @@ class Page extends React.Component {
     this.onSave = this.onSave.bind(this);
     this.onRevert = this.onRevert.bind(this);
     this.onChange = this.onChange.bind(this);
+
     this.pageContext = {
-      registerSaveHandler: this.registerSaveHandler.bind(this)
+      preSaveHook: this.preSaveHook.bind(this),
+      repoId: props.repoId,
+      branch: props.branch,
+      pageId: props.page.id
     };
 
-    this.saveHandlers = [];
+    this.preSaveHooks = [];
   }
 
-  registerSaveHandler(msg, handler) {
-    this.saveHandlers.push({msg, handler});
+  preSaveHook(msg, cb) {
+    this.preSaveHooks.push({msg, cb});
   }
 
-  processSaveHandlers([saveHandler, ...saveHandlers]) {
-    this.setState({savingMessage: saveHandler.msg});
-    return saveHandler.handler(this.props).then(() => {
-      if (saveHandlers.length > 0) {
-        return this.processSaveHandlers(saveHandlers);
+  processPreSaveHooks([preSaveHook, ...preSaveHooks]) {
+    this.setState({savingMessage: preSaveHook.msg});
+    return preSaveHook.cb().then(() => {
+      if (preSaveHooks.length > 0) {
+        return this.processPrevSaveHooks(preSaveHooks);
       }
     });
   }
@@ -55,7 +59,7 @@ class Page extends React.Component {
 
     this.setState({isSaving: true, isSuccess: false, error: null});
 
-    this.processSaveHandlers(this.saveHandlers)
+    this.processPreSaveHooks(this.preSaveHooks)
       .then(() => {
         this.setState({savingMessage: 'Saving changes'});
         return axios.post(`/edit/${repoId}/${branch}/${page.id}`, formData)
