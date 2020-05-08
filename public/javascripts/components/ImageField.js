@@ -1,6 +1,9 @@
+import axios from 'axios';
 import Cropper from 'cropperjs';
 import React from 'react';
 import { Alert, Button, ControlLabel, Panel, FormControl, FormGroup } from 'react-bootstrap';
+import isEqual from 'react-fast-compare';
+
 
 const imageMimeToExt = {
   'image/png': 'png',
@@ -30,29 +33,18 @@ class ImageField extends React.Component {
     }
   }
 
-  onChangeCrop({detail}) {
-    const { formData, uiSchema: { maxWidth } } = this.props;
-    const { imageCropX, imageCropY } = this.state;
-
-    const scale = maxWidth ? Math.max(1, detail.width / maxWidth) : 1;
-    const newWidth = Math.round(detail.width * scale);
-    const newHeight = Math.round(detail.height * scale);
-    const newCropX = Math.round(detail.x);
-    const newCropY = Math.round(detail.y);
-
-    const sizeChanged = formData.width !== newWidth || formData.height !== newHeight;
-    const positionChanged = imageCropX !== newCropX || imageCropY !== newCropY;
-
-    if (sizeChanged || positionChanged) {
+  onChangeCrop() {
+    const cropDetail = this.cropper.getData(true);
+    if (this.state.imageCropDetail && !isEqual(this.state.imageCropDetail, cropDetail)) {
       this.setState({
         imageChanged: true,
-        imageCropX: newCropX,
-        imageCropY: newCropY
+        imageCropDetail: cropDetail
       });
     }
   }
 
   onClickUpload() {
+    this.setState({imageUploading: true});
     new Promise(resolve => {
       this.cropper.getCroppedCanvas({
         maxWidth: this.props.uiSchema.maxWidth
@@ -68,32 +60,39 @@ class ImageField extends React.Component {
         width: 0,
         height: 0
       });
-      this.setState({imageChanged: false});
     }).catch(error => {
       console.log(error);
+      this.setState({imageUploading: false});
     });
   }
 
-  componentDidMount() {
-    // Do here to trigger componentDidUpdate and cropper
+  setImageStateFromProps() {
     const imageUrl = this.props.formData.url;
     if (imageUrl) {
       const urlParts = imageUrl.split('.');
       this.setState({
         imageSrc: imageUrl,
-        imageExt: urlParts[urlParts.length - 1]
+        imageExt: urlParts[urlParts.length - 1],
+        imageChanged: false,
+        imageUploading: false
       });
     }
   }
 
+  componentDidMount() {
+    // Do here to trigger componentDidUpdate and cropper
+    this.setImageStateFromProps();
+  }
+
   componentDidUpdate({formData}, {imageSrc}) {
-    if (formData.url !== this.props.formData.url) {
-      this.setState({imageUrl: this.props.formData.url});
+    if (!isEqual(formData, this.props.formData)) {
+      this.setImageStateFromProps();
     }
 
     if (imageSrc !== this.state.imageSrc) {
       if (this.cropper) {
         this.cropper.destroy();
+        this.setState({imageCropDetail: null});
       }
       if (this.state.imageSrc) {
         const aspectRatio = this.props.uiSchema.aspectRatio;
@@ -103,22 +102,19 @@ class ImageField extends React.Component {
           rotatable: false,
           scalable: false,
           viewMode: 1,
-          zoomable:false,
+          zoomable: false,
           // Only set crop listener on ready to avoid initial crop event
           ready: () => {
+            this.setState({imageCropDetail: this.cropper.getData(true)});
             this.imageRef.current.addEventListener('crop', this.onChangeCrop.bind(this));
           }
-        });
-        this.setState({
-          imageCropX: 0,
-          imageCropY: 0
         });
       }
     }
   }
 
   render() {
-    const { imageChanged, imageSrc } = this.state;
+    const { imageChanged, imageUploading, imageSrc } = this.state;
     const { name, idSchema, uiSchema } = this.props;
 
     return (
@@ -141,7 +137,9 @@ class ImageField extends React.Component {
                 <img src={imageSrc} ref={this.imageRef} />
               </div>}
             {imageChanged &&
-                <Button bsStyle="danger" onClick={this.onClickUpload.bind(this)}>Upload</Button>}
+              <Button bsStyle="danger" onClick={this.onClickUpload.bind(this)} disabled={imageUploading}>
+                {imageUploading ? 'Uploading...' : 'Upload'}
+              </Button>}
           </Panel.Body>
         </Panel>
       </div>

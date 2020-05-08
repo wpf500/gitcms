@@ -59,6 +59,7 @@
     "react-bootstrap-typeahead": "^4.1.0",
     "react-day-picker": "^7.4.0",
     "react-dom": "^16.13.1",
+    "react-fast-compare": "^3.0.2",
     "react-jsonschema-form": "^1.8.1",
     "react-jsonschema-form-extras": "^0.9.49",
     "react-rte": "^0.16.1",
