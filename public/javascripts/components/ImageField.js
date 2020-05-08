@@ -1,10 +1,6 @@
-import axios from 'axios';
 import Cropper from 'cropperjs';
 import React from 'react';
-import { Alert, ControlLabel, Panel, FormControl, FormGroup } from 'react-bootstrap';
-import { v4 as uuidv4 } from 'uuid';
-
-import PageContext from '../PageContext';
+import { Alert, Button, ControlLabel, Panel, FormControl, FormGroup } from 'react-bootstrap';
 
 const imageMimeToExt = {
   'image/png': 'png',
@@ -16,28 +12,11 @@ const imageExtToMime = Object.assign(
 );
 
 class ImageField extends React.Component {
-  constructor(props, context) {
-    super(props, context);
-
+  constructor(props) {
+    super(props);
     this.state = {};
     this.imageRef = React.createRef();
     this.cropper = null;
-
-    this.context.preSaveHook('Uploading images', this.onSave.bind(this));
-  }
-
-  get imageHandlerUrl() {
-    const { repoId, branch, pageId } = this.context;
-    return `/edit/${repoId}/${branch}/${pageId}/files`;
-  }
-
-  get imagePath() {
-    return this.props.uiSchema.uploadPath + '/' + this.imageName;
-  }
-
-  get imageName() {
-    const { uiSchema, formData: { url } } = this.props;
-    return url && url.replace(uiSchema.urlPrefix, '');
   }
 
   onChangeFile(evt) {
@@ -65,54 +44,53 @@ class ImageField extends React.Component {
     const positionChanged = imageCropX !== newCropX || imageCropY !== newCropY;
 
     if (sizeChanged || positionChanged) {
-      this.setState({imageChanged: true});
-
-      if (positionChanged) {
-        this.setState({
-          imageCropX: newCropX,
-          imageCropY: newCropY
-        });
-      }
-
-      if (sizeChanged) {
-        this.props.onChange({
-          ...formData,
-          width: newWidth,
-          height: newHeight
-        });
-      }
+      this.setState({
+        imageChanged: true,
+        imageCropX: newCropX,
+        imageCropY: newCropY
+      });
     }
   }
 
-  onSave() {
-    if (this.state.imageChanged) {
-      return new Promise(resolve => {
-        this.cropper.getCroppedCanvas({
-          maxWidth: this.props.uiSchema.maxWidth
-        }).toBlob(resolve, imageExtToMime[this.state.imageExt])
-      }).then(blob => {
-        let formData = new FormData();
-        formData.append('filepath', this.imagePath);
-        formData.append('file', blob);
-        return axios.post(this.imageHandlerUrl, formData);
+  onClickUpload() {
+    new Promise(resolve => {
+      this.cropper.getCroppedCanvas({
+        maxWidth: this.props.uiSchema.maxWidth
+      }).toBlob(resolve, imageExtToMime[this.state.imageExt])
+    }).then(blob => {
+      let formData = new FormData();
+      formData.append('ext', this.state.imageExt);
+      formData.append('file', blob);
+      return axios.post('/upload', formData);
+    }).then(res => {
+      this.props.onChange({
+        url: res.data.url,
+        width: 0,
+        height: 0
       });
-    } else {
-      return Promise.resolve();
-    }
+      this.setState({imageChanged: false});
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
   componentDidMount() {
     // Do here to trigger componentDidUpdate and cropper
-    if (this.props.formData.url) {
-      const urlParts = this.imagePath.split('.');
+    const imageUrl = this.props.formData.url;
+    if (imageUrl) {
+      const urlParts = imageUrl.split('.');
       this.setState({
-        imageSrc: `${this.imageHandlerUrl}?filepath=${encodeURIComponent(this.imagePath)}`,
+        imageSrc: imageUrl,
         imageExt: urlParts[urlParts.length - 1]
       });
     }
   }
 
-  componentDidUpdate(prevProps, {imageSrc, imageChanged}) {
+  componentDidUpdate({formData}, {imageSrc}) {
+    if (formData.url !== this.props.formData.url) {
+      this.setState({imageUrl: this.props.formData.url});
+    }
+
     if (imageSrc !== this.state.imageSrc) {
       if (this.cropper) {
         this.cropper.destroy();
@@ -137,17 +115,11 @@ class ImageField extends React.Component {
         });
       }
     }
-
-    if (this.state.imageChanged && !imageChanged) {
-      this.props.onChange({
-        url: this.props.uiSchema.urlPrefix + uuidv4() + '.' + this.state.imageExt
-      });
-    }
   }
 
   render() {
-    const { imageSrc } = this.state;
-    const { name, idSchema, formData, uiSchema } = this.props;
+    const { imageChanged, imageSrc } = this.state;
+    const { name, idSchema, uiSchema } = this.props;
 
     return (
       <div>
@@ -168,13 +140,13 @@ class ImageField extends React.Component {
               <div className="image-field-crop">
                 <img src={imageSrc} ref={this.imageRef} />
               </div>}
+            {imageChanged &&
+                <Button bsStyle="danger" onClick={this.onClickUpload.bind(this)}>Upload</Button>}
           </Panel.Body>
         </Panel>
       </div>
     );
   }
 }
-
-ImageField.contextType = PageContext;
 
 export default ImageField

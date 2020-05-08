@@ -36,6 +36,7 @@
     "webpack-stream": "^5.2.1"
   },
   "dependencies": {
+    "aws-sdk": "^2.672.0",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "bootstrap": "^3.4.0",
@@ -47,7 +48,6 @@
     "express-basic-auth": "^1.2.0",
     "express-nunjucks": "^2.2.5",
     "js-yaml": "^3.13.1",
-    "mime-types": "^2.1.26",
     "moment": "^2.24.0",
     "morgan": "^1.10.0",
     "mz": "^2.7.0",

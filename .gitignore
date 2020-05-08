@@ -1,4 +1,4 @@
-database.sqlite
+/database.sqlite
 node_modules/
 /build/
-auth.json
+/config.json

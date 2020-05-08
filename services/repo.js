@@ -110,6 +110,5 @@ async function cloneRepo(repoUrl, publicKey, privateKey) {
 module.exports = {
   openRepo,
   writeRepo,
-  cloneRepo,
-  getRepoDir
+  cloneRepo
 };
