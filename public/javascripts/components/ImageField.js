@@ -137,9 +137,14 @@ class ImageField extends React.Component {
                 <img src={imageSrc} ref={this.imageRef} />
               </div>}
             {imageChanged &&
-              <Button bsStyle="danger" onClick={this.onClickUpload.bind(this)} disabled={imageUploading}>
-                {imageUploading ? 'Uploading...' : 'Upload'}
-              </Button>}
+              <Alert bsStyle="warning">
+                <p>Your image will not be saved until your upload it</p>
+                <p>
+                  <Button bsStyle="warning" onClick={this.onClickUpload.bind(this)} disabled={imageUploading}>
+                    {imageUploading ? 'Uploading...' : 'Upload'}
+                  </Button>
+                </p>
+              </Alert>}
           </Panel.Body>
         </Panel>
       </div>
