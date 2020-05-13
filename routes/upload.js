@@ -17,16 +17,19 @@ const s3 = new AWS.S3({
 });
 
 router.post('/', busboy(), (req, res) => {
-  let ext;
+  let fields = {};
 
   req.busboy.on('field', (fieldname, value) => {
-    if (fieldname === 'ext') {
-      ext = value;
+    switch (fieldname) {
+      case 'ext':
+      case 'width':
+      case 'height':
+        fields[fieldname] = value;
     }
   });
 
   req.busboy.on('file', (fieldname, file, filename, encoding, mimeType) => {
-    const key = uuidv4() + '.' + ext;
+    const key = uuidv4() + '.' + fields.ext;
 
     s3.upload({
       ACL: 'public-read',
@@ -39,7 +42,11 @@ router.post('/', busboy(), (req, res) => {
       if (error) {
         res.status(400).send({error});
       } else {
-        res.send({url: config.upload.baseUrl + '/' + key});
+        res.send({
+          url: config.upload.baseUrl + '/' + key,
+          width: Number(fields.width),
+          height: Number(fields.height)
+        });
       }
     });
   });

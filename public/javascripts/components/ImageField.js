@@ -34,31 +34,35 @@ class ImageField extends React.Component {
   }
 
   onChangeCrop() {
-    const cropDetail = this.cropper.getData(true);
-    if (this.state.imageCropDetail && !isEqual(this.state.imageCropDetail, cropDetail)) {
-      this.setState({
-        imageChanged: true,
-        imageCropDetail: cropDetail
-      });
-    }
+    const data = this.cropper.getData(true);
+    const imageData = this.cropper.getImageData();
+    this.setState({
+      imageChanged: this.state.imageSrc.startsWith('blob:') || !(data.x === 0 && data.y === 0 && data.width === imageData.naturalWidth && data.height === imageData.naturalHeight)
+    });
   }
 
   onClickUpload() {
+    const maxWidth = this.props.uiSchema.maxWidth;
+    const data = this.cropper.getData(true);
+
     this.setState({imageUploading: true});
+
     new Promise(resolve => {
-      this.cropper.getCroppedCanvas({
-        maxWidth: this.props.uiSchema.maxWidth
-      }).toBlob(resolve, imageExtToMime[this.state.imageExt])
+      this.cropper.getCroppedCanvas({maxWidth})
+        .toBlob(resolve, imageExtToMime[this.state.imageExt])
     }).then(blob => {
       let formData = new FormData();
+      const scale = maxWidth ? Math.min(1, maxWidth / data.width) : 1;
       formData.append('ext', this.state.imageExt);
+      formData.append('width', data.width * scale);
+      formData.append('height', data.height * scale);
       formData.append('file', blob);
       return axios.post('/upload', formData);
     }).then(res => {
       this.props.onChange({
         url: res.data.url,
-        width: 0,
-        height: 0
+        width: res.data.width,
+        height: res.data.height
       });
     }).catch(error => {
       console.log(error);
@@ -92,20 +96,19 @@ class ImageField extends React.Component {
     if (imageSrc !== this.state.imageSrc) {
       if (this.cropper) {
         this.cropper.destroy();
-        this.setState({imageCropDetail: null});
       }
       if (this.state.imageSrc) {
         const aspectRatio = this.props.uiSchema.aspectRatio;
         this.cropper = new Cropper(this.imageRef.current, {
           aspectRatio: aspectRatio && aspectRatio[0] / aspectRatio[1],
           autoCropArea: 1,
+          restore: false,
           rotatable: false,
           scalable: false,
           viewMode: 1,
           zoomable: false,
           // Only set crop listener on ready to avoid initial crop event
           ready: () => {
-            this.setState({imageCropDetail: this.cropper.getData(true)});
             this.imageRef.current.addEventListener('crop', this.onChangeCrop.bind(this));
           }
         });
@@ -115,7 +118,7 @@ class ImageField extends React.Component {
 
   render() {
     const { imageChanged, imageUploading, imageSrc } = this.state;
-    const { name, idSchema, uiSchema } = this.props;
+    const { name, idSchema, uiSchema, formData } = this.props;
 
     return (
       <div>
@@ -145,6 +148,11 @@ class ImageField extends React.Component {
                   </Button>
                 </p>
               </Alert>}
+            {formData.url &&
+              <p>
+                Current image: <a href={formData.url} target="_blank">{formData.url}</a>{' '}
+                ({formData.width}×{formData.height})
+              </p>}
           </Panel.Body>
         </Panel>
       </div>
