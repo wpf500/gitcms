@@ -1,0 +1,13 @@
+{
+  "upload": {
+    "region": "",
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "bucket": "",
+    "keyPrefix": "",
+    "baseUrl": ""
+  },
+  "auth": {
+    "username": "password"
+  }
+}

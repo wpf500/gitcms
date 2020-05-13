@@ -4,13 +4,9 @@ A Git-based, JSON schema powered CMS
 
 ## To run
 
-Create a `auth.json` file, this will be used for the Basic Auth challenge
-```json
-{
-    "username": "password",
-    ...
-}
-```
+Copy `config.example.json` to `config.json` and fill it in. The `upload` settings
+are only needed if you want to support image uploading. `auth` will be used for
+the Basic Auth challenge.
 
 ```
 npm install
