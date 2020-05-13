@@ -8,17 +8,25 @@ function getRepoId(repoUrl) {
    return crypto.createHash('sha1').update(repoUrl).digest('hex');
 }
 
-function getRepoDir(repoId) {
-  return path.join(__dirname, '../repos', repoId);
+function getRepoPaths(repoId) {
+  const repoDir = path.join(__dirname, '../repos', repoId);
+  return {
+    repoDir,
+    publicKeyFile: repoDir + '.id_rsa.pub',
+    privateKeyFile: repoDir + '.id_rsa',
+    defFile: repoDir + '/.gitcms'
+  };
 }
 
-async function getFetchOpts(publicKey, privateKey) {
-  const creds = await Git.Cred.sshKeyMemoryNew('git', publicKey, privateKey, '');
+function getFetchOpts(repoId) {
+  const {publicKeyFile, privateKeyFile} = getRepoPaths(repoId);
 
   return {
     'callbacks': {
-      'credentials': () => creds,
-      'certificateCheck': () => 1
+      'credentials': function (url, userName) {
+        return Git.Cred.sshKeyNew(userName, publicKeyFile, privateKeyFile, '')
+      },
+      'certificateCheck': () => 0
     }
   };
 }
@@ -33,10 +41,10 @@ async function loadPage(repoDir, page) {
 }
 
 async function openRepo(dbRepo, branch) {
-  const repoDir = getRepoDir(dbRepo.id);
+  const {repoDir, defFile} = getRepoPaths(dbRepo.id);
   const repo = await Git.Repository.open(repoDir);
 
-  const fetchOpts = await getFetchOpts(dbRepo.publicKey, dbRepo.privateKey);
+  const fetchOpts = getFetchOpts(dbRepo.id);
   await repo.fetchAll(fetchOpts);
 
   try {
@@ -49,8 +57,6 @@ async function openRepo(dbRepo, branch) {
     const commit = await repo.getReferenceCommit('refs/remotes/origin/' + branch);
     await Git.Reset.reset(repo, commit, Git.Reset.TYPE.HARD, {});
   }
-
-  const defFile = path.join(repoDir, '.gitcms');
 
   const def = await fs.exists(defFile + '.yml') ?
     yaml.safeLoad(await fs.readFile(defFile + '.yml', 'utf8')) :
@@ -81,7 +87,7 @@ async function writeRepo(dbRepo, branch, pageId, data) {
     `Updated ${page.id}`);
 
   const remote = await repo.getRemote('origin');
-  const fetchOpts = await getFetchOpts(dbRepo.publicKey, dbRepo.privateKey);
+  const fetchOpts = getFetchOpts(dbRepo.id);
   await remote.push([`refs/heads/${branch}:refs/heads/${branch}`], fetchOpts);
 
   return oid;
@@ -89,13 +95,14 @@ async function writeRepo(dbRepo, branch, pageId, data) {
 
 async function cloneRepo(repoUrl, publicKey, privateKey) {
   const repoId = getRepoId(repoUrl);
-  const repoDir = getRepoDir(repoId);
+  const {repoDir, publicKeyFile,privateKeyFile} = getRepoPaths(repoId);
 
-  const exists = await fs.exists(repoDir);
-  if (exists) {
+  if (await fs.exists(repoDir)) {
     throw new Error("Already exists!");
   } else {
-    const fetchOpts = await getFetchOpts(publicKey, privateKey);
+    await fs.writeFile(publicKeyFile, publicKey);
+    await fs.writeFile(privateKeyFile, privateKey);
+    const fetchOpts = getFetchOpts(repoId);
     await Git.Clone(repoUrl, repoDir, {fetchOpts});
     return repoId;
   }

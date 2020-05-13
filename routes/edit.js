@@ -10,21 +10,25 @@ router.get('/:id', (req, res) => {
   res.redirect(req.originalUrl + '/master');
 });
 
-router.get('/:id/:branch', asyncHandler(async (req, res) => {
-  const {params: {id, branch}, auth: {user}} = req;
+const hasRepo = asyncHandler(async (req, res, next) => {
+  const dbRepo = await db.fetchRepo(req.params.id, req.auth.user);
+  if (dbRepo) {
+    req.dbRepo = dbRepo;
+    next();
+  } else {
+    next('route');
+  }
+});
 
-  const dbRepo = await db.fetchRepo(id, user);
+router.get('/:id/:branch', hasRepo, asyncHandler(async (req, res) => {
+  const {dbRepo, params: {branch}} = req;
   const repo = await openRepo(dbRepo, branch);
-
   res.render('edit/edit', {repo, dbRepo, branch});
 }));
 
-router.post('/:id/:branch/:page/', asyncHandler(async (req, res) => {
-  const {body, params: {id, branch, page}, auth: {user}} = req;
-
-  const dbRepo = await db.fetchRepo(id, user);
+router.post('/:id/:branch/:page', hasRepo, asyncHandler(async (req, res) => {
+  const {dbRepo, body, params: {branch, page}} = req;
   const oid = await writeRepo(dbRepo, branch, page, body);
-
   res.send(oid);
 }));
 

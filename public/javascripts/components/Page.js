@@ -4,7 +4,12 @@ import {Alert, Button, Tab} from 'react-bootstrap';
 import Form from 'react-jsonschema-form';
 import extrasFields from 'react-jsonschema-form-extras';
 
-const fields = extrasFields;
+import ImageField from './ImageField';
+
+const fields = {
+  ...extrasFields,
+  image: ImageField
+};
 
 class Page extends React.Component {
   constructor(props) {
@@ -20,26 +25,32 @@ class Page extends React.Component {
     this.onChange = this.onChange.bind(this);
   }
 
+  get saveUrl() {
+    return `/edit/${this.props.repoId}/${this.props.branch}/${this.props.page.id}`;
+  }
+
   onClearError() {
     this.setState({error: null});
   }
 
   onSave() {
-    const {page} = this.props;
-    const {formData} = this.state;
+    this.setState({
+      isSaving: true,
+      isSuccess: false,
+      error: null
+    });
 
-    this.setState({isSaving: true, isSuccess: false, error: null});
-
-    axios.post(window.location.href + '/' + page.id, formData)
+    axios.post(this.saveUrl, this.state.formData)
       .then(() => {
         this.setState({isSuccess: true, hasChanged: false});
         setTimeout(() => this.setState({isSuccess: false}), 5000);
       })
       .catch(error => {
-        console.error(error);
         this.setState({error});
       })
-      .then(() => this.setState({isSaving: false}));
+      .then(() => {
+        this.setState({isSaving: false});
+      });
   }
 
   onRevert() {

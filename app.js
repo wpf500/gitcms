@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const routes = require('./routes');
 const db = require('./services/db');
 
-const auth = require('./auth.json');
+const config = require('./config.json');
 
 const app = express();
 const isDev = app.get('env') === 'development';
@@ -21,7 +21,7 @@ expressNunjucks(app, {
 });
 
 app.use(morgan(':date[iso] :method :url :status :response-time ms - :res[content-length]'));
-app.use(basicAuth({'users': auth, 'challenge': true}));
+app.use(basicAuth({'users': config.auth, 'challenge': true}));
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
 app.use(compression());

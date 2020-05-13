@@ -32,8 +32,8 @@ const build = gulp.parallel(css, js, fonts);
 
 function watch() {
   const watcher = gulp.watch(['./public/**/*'], build);
-  watcher.on('change', evt => {
-    console.log('File ' + evt.path + ' was ' + evt.type);
+  watcher.on('change', file => {
+    console.log(`File ${file} was changed`);
   });
 }
 

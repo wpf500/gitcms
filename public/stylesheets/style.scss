@@ -1,4 +1,5 @@
 @import "../../node_modules/bootstrap/dist/css/bootstrap";
+@import "../../node_modules/cropperjs/dist/cropper";
 
 fieldset {
   padding: .35em .625em .75em;
@@ -67,4 +68,13 @@ legend {
 
 .page-back {
   margin-top: 20px;
+}
+
+.image-field-crop {
+  margin-bottom: 20px;
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
 }
