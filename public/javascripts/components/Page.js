@@ -26,7 +26,7 @@ class Page extends React.Component {
   }
 
   get saveUrl() {
-    return `/edit/${this.props.repoId}/${this.props.branch}/${this.props.page.id}`;
+    return `/edit/${this.props.repoId}/branch/${this.props.branch}/${this.props.page.id}`;
   }
 
   onClearError() {

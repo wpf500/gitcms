@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+<style>
+    textarea {
+        min-height: 200px;
+    }
+
+    .tab-pane {
+        padding-top: 20px;
+    }
+
+    form > .form-group > fieldset {
+        border: 0;
+        padding: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<p class="page-back">
+  <a class="btn btn-xs btn-default" href="/edit">
+    <span class="glyphicon glyphicon-arrow-left"></span> Back
+  </a>
+  <a class="btn btn-xs btn-default" href="/edit/{{ dbRepo.id }}/settings">
+    <span class="glyphicon glyphicon-cog"></span> Settings
+  </a>
+</p>
+<h1>{{ dbRepo.name }}</h1>
+<p>You are editing the {{ branch }} branch</p>
+<p>
+  <a class="btn btn-default" href="{{ dbRepo.liveUrl }}">View site</a>
+</p>
+<div id="content"></div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    window.GitCMS = {
+        'pages': {{ repo.pages|dump|safe }},
+        'branch': '{{ branch }}',
+        'repoId': '{{ dbRepo.id }}'
+    };
+</script>
+<script src="/public/javascripts/main.js"></script>
+{% endblock %}

@@ -3,6 +3,16 @@ const fs = require('mz/fs');
 const crypto = require('crypto');
 const Git = require('nodegit');
 const yaml = require('js-yaml');
+const rimraf = require('rimraf');
+
+function rimrafPromise(...args) {
+  return new Promise((resolve, reject) => {
+    rimraf(...args, error => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+}
 
 function getRepoId(repoUrl) {
    return crypto.createHash('sha1').update(repoUrl).digest('hex');
@@ -95,10 +105,10 @@ async function writeRepo(dbRepo, branch, pageId, data) {
 
 async function cloneRepo(repoUrl, publicKey, privateKey) {
   const repoId = getRepoId(repoUrl);
-  const {repoDir, publicKeyFile,privateKeyFile} = getRepoPaths(repoId);
+  const {repoDir, publicKeyFile, privateKeyFile} = getRepoPaths(repoId);
 
   if (await fs.exists(repoDir)) {
-    throw new Error("Already exists!");
+    throw new Error(repoDir + ' already exists!');
   } else {
     await fs.writeFile(publicKeyFile, publicKey);
     await fs.writeFile(privateKeyFile, privateKey);
@@ -108,8 +118,17 @@ async function cloneRepo(repoUrl, publicKey, privateKey) {
   }
 }
 
+async function deleteRepo(dbRepo) {
+  const {repoDir, publicKeyFile, privateKeyFile} = getRepoPaths(dbRepo.id);
+  await rimrafPromise(publicKeyFile);
+  await rimrafPromise(privateKeyFile);
+  await rimrafPromise(repoDir);
+}
+
 module.exports = {
+  getRepoPaths,
   openRepo,
   writeRepo,
-  cloneRepo
+  cloneRepo,
+  deleteRepo
 };

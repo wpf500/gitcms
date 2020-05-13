@@ -63,6 +63,7 @@
     "react-jsonschema-form": "^1.8.1",
     "react-jsonschema-form-extras": "^0.9.49",
     "react-rte": "^0.16.1",
+    "rimraf": "^3.0.2",
     "sqlite": "^3.0.6",
     "ssh-keygen2": "^0.1.0",
     "uuid": "^7.0.3"
