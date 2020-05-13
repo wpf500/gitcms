@@ -23,6 +23,16 @@ legend {
   border-bottom: 0;
 }
 
+.checkbox {
+  label {
+    padding-left: 25px;
+  }
+  input[type="checkbox"] {
+    margin-top: 0;
+    margin-left: -25px;
+  }
+}
+
 .sticky-alert {
   position: sticky;
   z-index: 100;

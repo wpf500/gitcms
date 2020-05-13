@@ -12,22 +12,43 @@ async function open() {
   }
 }
 
-async function addRepo(id, name, url, liveUrl, users, publicKey, privateKey) {
-  await db.run(`INSERT INTO repositories (id, name, url, liveUrl, users, publicKey, privateKey)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`, id, name, url, liveUrl, users, publicKey, privateKey);
+async function addRepo(id, name, url, liveUrl, users) {
+  await db.run(
+    `INSERT INTO repositories (id, name, url, liveUrl, users) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    id, name, url, liveUrl, users
+  );
+}
+
+async function deleteRepo(id) {
+  await db.run(`DELETE FROM repositories WHERE id=?`, id);
 }
 
 async function fetchRepo(id, user) {
-  return await db.get('SELECT * FROM repositories WHERE id=? AND users LIKE ?', id, '%,' + user + ',%');
+  return await db.get(
+    'SELECT * FROM repositories WHERE id=? AND users LIKE ?',
+    id, `%,${user},%`
+  );
 }
 
 async function listRepos(user) {
-  return await db.all('SELECT * FROM repositories WHERE users LIKE ?', '%,' + user + ',%');
+  return await db.all(
+    'SELECT * FROM repositories WHERE users LIKE ?',
+    `%,${user},%`
+  );
+}
+
+async function updateRepo(id, name, liveUrl, users) {
+  await db.run(
+    `UPDATE repositories SET name=?, liveUrl=?, users=? WHERE id=?`,
+    name, liveUrl, users, id
+  );
 }
 
 module.exports = {
   open,
   addRepo,
+  deleteRepo,
   fetchRepo,
-  listRepos
+  listRepos,
+  updateRepo
 };

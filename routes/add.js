@@ -17,7 +17,10 @@ router.use((req, res, next) => {
 
 router.get('/', (req, res) => {
   keygen((err, keypair) => {
-    res.render('add', keypair);
+    res.render('edit/settings', {
+      publicKey: keypair.public,
+      privateKey: keypair.private
+    });
   });
 });
 
@@ -25,7 +28,7 @@ router.post('/', asyncHandler(async (req, res) => {
   const {repoUrl, repoLiveUrl, repoName, repoUsers, privateKey, publicKey} = req.body;
 
   const repoId = await cloneRepo(repoUrl, publicKey, privateKey);
-  await db.addRepo(repoId, repoName, repoUrl, repoLiveUrl, ',' + repoUsers + ',', publicKey, privateKey);
+  await db.addRepo(repoId, repoName, repoUrl, repoLiveUrl, repoUsers);
 
   res.redirect('/edit/' + repoId);
 }));

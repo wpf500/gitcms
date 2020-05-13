@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if dbRepo.id %}
+  <p class="page-back">
+    <a class="btn btn-xs btn-default" href="/edit/{{ dbRepo.id }}">
+      <span class="glyphicon glyphicon-arrow-left"></span> Back
+    </a>
+  </p>
+  <h1>{{ dbRepo.name }}</h1>
+  <h2>Edit settings</h2>
+{% else %}
+  <h1>Add project</h1>
+{% endif %}
+<form method="POST">
+    <div class="form-group">
+        <label for="repoUrl" class="control-label">Repository URL</label>
+        {% if dbRepo.id %}
+            <p class="form-control-static">{{ dbRepo.url }}</p>
+        {% else %}
+          <input
+              type="text" class="form-control" id="repoUrl" name="repoUrl"
+              placeholder="git@github.com:project" required pattern="[^@]+@[^:]+:.+"
+          />
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label for="repoName" class="control-label">Name</label>
+        <input
+            type="text" class="form-control" id="repoName" name="repoName"
+            placeholder="Project name" value="{{ dbRepo.name }}" required
+        />
+    </div>
+    <div class="form-group">
+        <label for="repoLiveUrl" class="control-label">Live site URL</label>
+        <input
+            type="text" class="form-control" id="repoLiveUrl" name="repoLiveUrl"
+            placeholder="Project name" value="{{ dbRepo.liveUrl }}" required
+        />
+    </div>
+    <div class="form-group">
+        <label for="repoUsers" class="control-label">Authorised users</label>
+        <input
+            type="text" class="form-control" id="repoUsers" name="repoUsers"
+            placeholder="admin,user1" value="{{ dbRepo.users }}" required
+        />
+        <p class="help-block">
+            Comma separated list of users who can edit this project
+        </p>
+    </div>
+    <div class="form-group">
+        <label for="publicKey" class="control-label">Public key</label>
+        <textarea class="form-control" id="publicKey" name="publicKey"
+                  rows="8" readonly>{{ publicKey }}</textarea>
+        <p class="help-block">
+            Add this key to your repository (e.g. as a deploy key)
+        </p>
+    </div>
+    {% if not dbRepo.id %}
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" required />
+                    I have copied the public key
+                </label>
+            </div>
+        </div>
+
+        <input type="hidden" name="privateKey" value="{{ privateKey }}" />
+    {% endif %}
+
+    <button name="action" value="save" class="btn btn-primary">Save</button>
+</form>
+
+{% if dbRepo.id %}
+    <hr>
+    <h2>Delete project</h2>
+    <form method="POST">
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" required />
+                    Are you sure? This action is irreversible
+                </label>
+            </div>
+        </div>
+        <button name="action" value="delete" class="btn btn-danger">Delete</button>
+  </form>
+{% endif %}
+{% endblock %}
