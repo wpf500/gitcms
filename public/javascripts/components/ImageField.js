@@ -42,30 +42,30 @@ class ImageField extends React.Component {
   }
 
   onClickUpload() {
-    const maxWidth = this.props.uiSchema.maxWidth;
+    const {maxWidth, filePrefix} = this.props.uiSchema;
+
     const data = this.cropper.getData(true);
+    const scale = maxWidth ? Math.min(1, maxWidth / data.width) : 1;
+    const width = Math.round(data.width * scale);
+    const height = Math.round(data.height * scale);
 
     this.setState({imageUploading: true});
 
     new Promise(resolve => {
-      this.cropper.getCroppedCanvas({maxWidth})
+      this.cropper.getCroppedCanvas({width, height})
         .toBlob(resolve, imageExtToMime[this.state.imageExt])
     }).then(blob => {
       let formData = new FormData();
-      const scale = maxWidth ? Math.min(1, maxWidth / data.width) : 1;
-      formData.append('ext', this.state.imageExt);
-      formData.append('width', data.width * scale);
-      formData.append('height', data.height * scale);
+      formData.append('fileExt', this.state.imageExt);
+      if (filePrefix) {
+        formData.append('filePrefix', filePrefix);
+      }
       formData.append('file', blob);
       return axios.post('/upload', formData);
     }).then(res => {
-      this.props.onChange({
-        url: res.data.url,
-        width: res.data.width,
-        height: res.data.height
-      });
+      this.props.onChange({url: res.data.url, width, height});
     }).catch(error => {
-      console.log(error);
+      console.error(error);
       this.setState({imageUploading: false});
     });
   }

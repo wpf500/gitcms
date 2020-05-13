@@ -21,15 +21,14 @@ router.post('/', busboy(), (req, res) => {
 
   req.busboy.on('field', (fieldname, value) => {
     switch (fieldname) {
-      case 'ext':
-      case 'width':
-      case 'height':
+      case 'fileExt':
+      case 'filePrefix':
         fields[fieldname] = value;
     }
   });
 
   req.busboy.on('file', (fieldname, file, filename, encoding, mimeType) => {
-    const key = uuidv4() + '.' + fields.ext;
+    const key = (fields.filePrefix || '') + uuidv4() + '.' + fields.fileExt;
 
     s3.upload({
       ACL: 'public-read',
@@ -43,9 +42,7 @@ router.post('/', busboy(), (req, res) => {
         res.status(400).send({error});
       } else {
         res.send({
-          url: config.upload.baseUrl + '/' + key,
-          width: Number(fields.width),
-          height: Number(fields.height)
+          url: config.upload.baseUrl + '/' + key
         });
       }
     });
