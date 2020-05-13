@@ -2,7 +2,7 @@ const express = require('express');
 const asyncHandler = require('express-async-handler');
 const fs = require('mz/fs');
 
-const { getRepoPaths, openRepo, writeRepo } = require('../services/repo');
+const { getRepoPaths, openRepo, writeRepo, deleteRepo } = require('../services/repo');
 const db = require('../services/db');
 
 const router = express.Router();
@@ -39,9 +39,15 @@ router.get('/:id/settings', hasRepo, asyncHandler(async (req, res) => {
 }));
 
 router.post('/:id/settings', hasRepo, asyncHandler(async (req, res) => {
-  const {repoLiveUrl, repoName, repoUsers} = req.body;
-  await db.updateRepo(req.params.id, repoName, repoLiveUrl, repoUsers);
-  res.redirect(`${req.baseUrl}/${req.params.id}/settings`);
+  const {repoLiveUrl, repoName, repoUsers, action} = req.body;
+  if (action === 'save') {
+    await db.updateRepo(req.params.id, repoName, repoLiveUrl, repoUsers);
+    res.redirect(`${req.baseUrl}/${req.params.id}/settings`);
+  } else if (action === 'delete') {
+    await db.deleteRepo(req.params.id);
+    await deleteRepo(req.dbRepo);
+    res.redirect('/');
+  }
 }));
 
 // Redirect old URLs
