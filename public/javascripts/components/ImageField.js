@@ -55,13 +55,13 @@ class ImageField extends React.Component {
       this.cropper.getCroppedCanvas({width, height})
         .toBlob(resolve, imageExtToMime[this.state.imageExt])
     }).then(blob => {
-      let formData = new FormData();
-      formData.append('fileExt', this.state.imageExt);
+      let uploadData = new FormData();
+      uploadData.append('fileExt', this.state.imageExt);
       if (filePrefix) {
-        formData.append('filePrefix', filePrefix);
+        uploadData.append('filePrefix', filePrefix);
       }
-      formData.append('file', blob);
-      return axios.post('/upload', formData);
+      uploadData.append('file', blob);
+      return axios.post('/upload', uploadData);
     }).then(res => {
       this.props.onChange({url: res.data.url, width, height});
     }).catch(error => {
@@ -71,7 +71,7 @@ class ImageField extends React.Component {
   }
 
   setImageStateFromProps() {
-    const imageUrl = this.props.formData.url;
+    const imageUrl = this.props.formData && this.props.formData.url;
     if (imageUrl) {
       const urlParts = imageUrl.split('.');
       this.setState({
@@ -118,7 +118,7 @@ class ImageField extends React.Component {
 
   render() {
     const { imageChanged, imageUploading, imageSrc } = this.state;
-    const { name, idSchema, uiSchema, formData } = this.props;
+    const { name, idSchema, uiSchema, formData = {} } = this.props;
 
     return (
       <div>
